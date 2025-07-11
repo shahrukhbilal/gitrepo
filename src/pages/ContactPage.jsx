@@ -1,6 +1,41 @@
-import React from 'react';
-
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 const ContactPage = () => {
+  const navigate= useNavigate()
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert('Message sent successfully!');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+          navigate('/feedback')
+      } else {
+        alert(data.message || 'Something went wrong.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Server error!');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
       {/* Header */}
@@ -16,11 +51,15 @@ const ContactPage = () => {
         {/* Contact Info */}
         <div className="space-y-6">
           <h2 className="text-2xl font-semibold">Contact Information</h2>
-          <p className="text-gray-600">Feel free to reach us using the details below or fill the form.</p>
+          <p className="text-gray-600">
+            Feel free to reach us using the details below or fill the form.
+          </p>
 
           <div>
             <h4 className="font-bold text-sm">📍 Address</h4>
-            <p className="text-gray-600">Navy Housing Society, National Stadium Road, Karachi</p>
+            <p className="text-gray-600">
+              Navy Housing Society, National Stadium Road, Karachi
+            </p>
           </div>
 
           <div>
@@ -37,13 +76,17 @@ const ContactPage = () => {
         {/* Contact Form */}
         <div className="bg-white shadow-lg rounded-xl p-8">
           <h2 className="text-xl font-semibold mb-6">Send Us a Message</h2>
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium mb-1">Name</label>
               <input
                 type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 placeholder="Your name"
+                required
               />
             </div>
 
@@ -51,18 +94,38 @@ const ContactPage = () => {
               <label className="block text-sm font-medium mb-1">Email</label>
               <input
                 type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 placeholder="you@example.com"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Subject</label>
+              <input
+                type="text"
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                placeholder="Subject"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Message</label>
               <textarea
+                name="message"
                 rows="4"
+                value={formData.message}
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 placeholder="Write your message..."
-              ></textarea>
+                required
+              />
             </div>
 
             <button

@@ -11,6 +11,7 @@ import AuthForm from './components/AuthForm';
 import Shop from './pages/Shop';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import FeedbackPage from './pages/FeedbackPage';
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
 <Route path='/shop' element= {<Shop></Shop>}></Route>
 <Route path='/about' element= {<AboutPage></AboutPage>}></Route>
 <Route path='/contact' element={<ContactPage></ContactPage>}></Route>
+<Route path='/feedback' element={<FeedbackPage></FeedbackPage>}></Route>
         </Route>
       </Routes>
     </Router>
