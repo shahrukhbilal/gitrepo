@@ -8,6 +8,9 @@ import CheckoutPage from './pages/CheckoutPage';
 import ThankYouPage from './pages/Thankyou';
 import MyOrdersPage from './pages/MyOdersPage';
 import AuthForm from './components/AuthForm';
+import Shop from './pages/Shop';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
 
 
 function App() {
@@ -27,6 +30,9 @@ function App() {
 <Route path='/thankyou' element= {<ThankYouPage></ThankYouPage>}></Route>
 <Route path='/my-orders' element={<MyOrdersPage></MyOrdersPage>}></Route>
 <Route path='/login' element= {<AuthForm></AuthForm>}></Route>
+<Route path='/shop' element= {<Shop></Shop>}></Route>
+<Route path='/about' element= {<AboutPage></AboutPage>}></Route>
+<Route path='/contact' element={<ContactPage></ContactPage>}></Route>
         </Route>
       </Routes>
     </Router>

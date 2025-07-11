@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
+const token = localStorage.getItem("token");
 const CheckoutPage = () => {
   const cartItems = useSelector(state => state.cart.items);
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -45,11 +45,14 @@ console.log("Order data being sent:", orderData);
 
 
     try {
-      const res = await fetch('http://localhost:5000/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-      });
+     const res = await fetch("http://localhost:5000/api/orders", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`, // ✅ Add this
+  },
+  body: JSON.stringify(orderData),
+});
       const data = await res.json();
 
       if (res.ok) {

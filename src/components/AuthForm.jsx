@@ -35,6 +35,7 @@ const AuthForm = () => {
         : await register(payload).unwrap();
 
       dispatch(setCredentials({ token: res.token, user: res.user }));
+      localStorage.setItem("token", res.token);
       navigate('/my-orders');
     } catch (err) {
       alert(err.data?.message || 'Something went wrong');

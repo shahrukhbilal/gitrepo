@@ -4,6 +4,7 @@ import MainNavbar from './components/MainNavbar';
 import HeroSection from './components/HeroSection';
 import ProductSection from './components/ProductSection';
 import FeaturedCategories from './components/FeaturedCategories';
+import MainFooter from './components/MainFooter';
 
 export default function MainLayout() {
   return (
@@ -14,7 +15,7 @@ export default function MainLayout() {
       <Outlet />          {/* Renders Home content */}
       <FeaturedCategories />
       <ProductSection></ProductSection>
-      
+      <MainFooter></MainFooter>
     </>
   );
 }
