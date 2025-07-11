@@ -10,7 +10,7 @@ const featuredCategoryRoutes = require('./routes/featuredCategoryRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderHandlerRoutes = require('./routes/orderHandlerRoutes');
 const handleLoginRoutes= require('./routes/handleLoginRoutes')
-
+const contactRoutes= require('./routes/contactRoutes')
 connectDB()
 app.use(cors())
 
@@ -23,7 +23,7 @@ app.use('/api/featured-categories', featuredCategoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderHandlerRoutes); 
 app.use('/api/auth', handleLoginRoutes)
-
+app.use('/api/contact', contactRoutes)
 app.listen(PORT, (req, res)=>{
     console.log('server is running ')
 })
