@@ -1,4 +1,5 @@
 // backend/routes/orderHandlerRoutes.js
+
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
@@ -9,20 +10,7 @@ const isValidObjectId = id =>
   mongoose.Types.ObjectId.isValid(id) &&
   String(new mongoose.Types.ObjectId(id)) === id;
 
-// 📦 Fetch orders by email (admin use or testing)
-router.get('/', async (req, res) => {
-  try {
-    const { email } = req.query;
-    const query = email ? { email } : {};
-    const orders = await Order.find(query).sort({ createdAt: -1 });
-    res.status(200).json(orders);
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    res.status(500).json({ message: 'Failed to fetch orders' });
-  }
-});
-
-// 🗓️ Fetch only logged-in user’s orders
+// 🔐 🗓️ Fetch orders only for the logged-in user
 router.get('/my-orders', verifyToken, async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user.userId }).sort({ createdAt: -1 });
@@ -30,6 +18,19 @@ router.get('/my-orders', verifyToken, async (req, res) => {
   } catch (err) {
     console.error('Error fetching user orders:', err);
     res.status(500).json({ message: 'Failed to fetch your orders' });
+  }
+});
+
+// 🛡️ 📦 Fetch all orders (for admin/testing use only)
+router.get('/admin-orders', async (req, res) => {
+  try {
+    const { email } = req.query;
+    const query = email ? { email } : {};
+    const orders = await Order.find(query).sort({ createdAt: -1 });
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error('Error fetching all/admin orders:', error);
+    res.status(500).json({ message: 'Failed to fetch admin orders' });
   }
 });
 
