@@ -1,25 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { Loader2, PackageCheck } from 'lucide-react'; // Optional: icons for polish
+import { useSelector } from 'react-redux';
+import { Loader2, PackageCheck } from 'lucide-react';
 
 const MyOrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const token = useSelector((state) => state.auth.token);
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/orders?email=southsec021karachi@gmail.com`);
+        const res = await fetch('http://localhost:5000/api/orders/my-orders', {
+          headers: {
+            'Content-Type': 'application/json',
+         Authorization: `Bearer ${token}`,
+          },
+        });
+
         const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || 'Failed to fetch orders');
+        }
+
         setOrders(data);
       } catch (error) {
-        console.error('Error loading orders:', error);
+        console.error('Error loading orders:', error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrders();
-  }, []);
+    if (token) {
+      fetchOrders();
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 md:px-16 py-12">

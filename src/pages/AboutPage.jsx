@@ -4,7 +4,7 @@ import image from '../assets/StoryImage.jpeg'
 const AboutPage = () => {
   return (
     <div className="bg-gray-50 text-gray-800">
-      <HeroSection></HeroSection>
+      
       <section className="bg-yellow-400 text-black py-16 px-6 text-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">About Us</h1>
         <p className="max-w-3xl mx-auto text-lg">

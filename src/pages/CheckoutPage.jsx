@@ -1,10 +1,10 @@
-// src/pages/CheckoutPage.jsx
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-const token = localStorage.getItem("token");
+
 const CheckoutPage = () => {
   const cartItems = useSelector(state => state.cart.items);
+  const token = useSelector(state => state.auth.token); // ✅ Correct way
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const navigate = useNavigate();
 
@@ -24,35 +24,35 @@ const CheckoutPage = () => {
       return;
     }
 
-   const orderData = {
-  fullName: form.fullName,
-  email: form.email,
-  phone: form.phone,
-  address: form.address,
-  city: form.city,
-  zip: form.zip,
-  paymentMethod: form.paymentMethod,
-  items: cartItems.map(item => ({
-    productId: item._id,
-    name: item.name,
-    quantity: item.quantity,
-    price: item.price,
-  })),
-  total  // now flat and correct
-};
+    const orderData = {
+      fullName: form.fullName,
+      email: form.email,
+      phone: form.phone,
+      address: form.address,
+      city: form.city,
+      zip: form.zip,
+      paymentMethod: form.paymentMethod,
+      items: cartItems.map(item => ({
+        productId: item._id,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      total
+    };
 
-console.log("Order data being sent:", orderData);
-
+    console.log("Order data being sent:", orderData);
 
     try {
-     const res = await fetch("http://localhost:5000/api/orders", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`, // ✅ Add this
-  },
-  body: JSON.stringify(orderData),
-});
+      const res = await fetch("http://localhost:5000/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ This will now work
+        },
+        body: JSON.stringify(orderData),
+      });
+
       const data = await res.json();
 
       if (res.ok) {
@@ -71,7 +71,7 @@ console.log("Order data being sent:", orderData);
     <div className="max-w-4xl mx-auto p-4 py-10">
       <h2 className="text-3xl font-bold mb-6 text-center">Checkout</h2>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 shadow rounded-lg">
-        {['fullName','email','phone','address','city','zip'].map(name => (
+        {['fullName', 'email', 'phone', 'address', 'city', 'zip'].map(name => (
           <input
             key={name}
             type={name === 'email' ? 'email' : 'text'}

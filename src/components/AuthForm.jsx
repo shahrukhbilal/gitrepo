@@ -1,9 +1,10 @@
-// src/pages/AuthForm.jsx
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useLoginMutation, useRegisterMutation } from '../redux/api';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../redux/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,101 +14,127 @@ const AuthForm = () => {
   const [register, { isLoading: registering }] = useRegisterMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const nameInputRef = useRef(null);
 
   const toggleForm = () => {
     setIsLogin(!isLogin);
     setFormData({ fullName: '', email: '', password: '' });
+    setTimeout(() => {
+      if (nameInputRef.current) nameInputRef.current.focus();
+    }, 100);
   };
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const validateForm = () => {
+    const { fullName, email, password } = formData;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email || !password || (!isLogin && !fullName)) {
+      toast.error('All fields are required!');
+      return false;
+    }
+
+    if (!emailRegex.test(email)) {
+      toast.error('Please enter a valid email address!');
+      return false;
+    }
+
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters!');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
     try {
-       const payload = isLogin
-   ? { email: formData.email, password: formData.password }
-  : { name: formData.fullName, email: formData.email, password: formData.password };
+      const payload = isLogin
+        ? { email: formData.email, password: formData.password }
+        : { name: formData.fullName, email: formData.email, password: formData.password };
 
       const res = isLogin
         ? await login(payload).unwrap()
         : await register(payload).unwrap();
 
       dispatch(setCredentials({ token: res.token, user: res.user }));
-      localStorage.setItem("token", res.token);
+      setFormData({ fullName: '', email: '', password: '' });
+      toast.success(isLogin ? 'Login successful!' : 'Registration successful!');
       navigate('/my-orders');
     } catch (err) {
-      alert(err.data?.message || 'Something went wrong');
+      toast.error(err?.data?.message || 'Something went wrong.');
     }
   };
 
-  const isSubmitting = loggingIn || registering;
-  const btnLabel = isLogin
-    ? (loggingIn ? 'Logging in...' : 'Login')
-    : (registering ? 'Registering...' : 'Register');
-
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white shadow-md rounded-2xl p-8">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          {isLogin ? 'Login to Your Account' : 'Create New Account'}
-        </h2>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <div className="bg-white shadow-md rounded-2xl p-8 w-full max-w-md">
+        <h3 className="text-2xl font-bold text-center text-gray-800 mb-6">
+          {isLogin ? '👤 User Login' : '📝 Register'}
+        </h3>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} autoComplete="off" className="space-y-5">
           {!isLogin && (
-            <div className="relative">
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">Full Name</label>
               <input
                 type="text"
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
+                placeholder="Your name"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 required
-                className="peer w-full border-b-2 border-gray-300 focus:border-yellow-500 focus:outline-none py-2 placeholder-transparent"
-                placeholder="Full Name"
+                autoFocus
+                ref={nameInputRef}
+                autoComplete="off"
               />
-              <label className="absolute left-0 top-2 text-gray-500 text-sm peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 transition-all duration-200">
-                
-              </label>
             </div>
           )}
 
-          <div className="relative">
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">Email Address</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
+              placeholder="you@example.com"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               required
-              className="peer w-full border-b-2 border-gray-300 focus:border-yellow-500 focus:outline-none py-2 placeholder-transparent"
-              placeholder="Email Address"
+              autoComplete="off"
             />
-            <label className="absolute left-0 top-2 text-gray-500 text-sm peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 transition-all duration-200">
-              
-            </label>
           </div>
 
-          <div className="relative">
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">Password</label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
+              placeholder="••••••••"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               required
-              className="peer w-full border-b-2 border-gray-300 focus:border-yellow-500 focus:outline-none py-2 placeholder-transparent"
-              placeholder="Password"
+              autoComplete="off"
             />
-            <label className="absolute left-0 top-2 text-gray-500 text-sm peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 transition-all duration-200">
-              
-            </label>
           </div>
 
           <button
             type="submit"
-            disabled={isSubmitting}
-            className={`w-full ${isSubmitting ? 'bg-gray-400' : 'bg-yellow-400 hover:bg-yellow-500'} text-black font-semibold py-2 rounded-xl transition duration-300`}
+            disabled={loggingIn || registering}
+            className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 rounded-lg transition duration-300"
           >
-            {btnLabel}
+            {loggingIn || registering
+              ? isLogin ? 'Logging in...' : 'Registering...'
+              : isLogin ? 'Login' : 'Register'}
           </button>
         </form>
 
@@ -118,6 +145,8 @@ const AuthForm = () => {
           </button>
         </p>
       </div>
+
+      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 };

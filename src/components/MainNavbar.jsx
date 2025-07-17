@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import brandLogo from '../assets/Brand.png'; // ✅ Your logo image
 
 const MainNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -7,7 +8,6 @@ const MainNavbar = () => {
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  // 🔁 Fetch categories from backend
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -26,8 +26,11 @@ const MainNavbar = () => {
     <nav className="bg-white shadow-md px-4 py-3">
       {/* Container */}
       <div className="flex justify-between items-center max-w-6xl mx-auto">
-        {/* Brand */}
-        <h2 className="text-xl font-bold text-gray-800">Categories</h2>
+        
+        {/* ✅ Brand Logo */}
+        <a href="/" className="flex items-center space-x-4">
+          <img src={brandLogo} alt="Brand Logo" className="h-30 w-auto object-contain" />
+        </a>
 
         {/* Hamburger icon (mobile only) */}
         <div className="md:hidden">

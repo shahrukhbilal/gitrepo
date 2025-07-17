@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const ContactPage = () => {
-  const navigate= useNavigate()
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -9,13 +13,39 @@ const ContactPage = () => {
     message: '',
   });
 
+  const [loading, setLoading] = useState(false);
+
+  // ✅ Input Validation
+  const validateForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      toast.error('All fields are required!');
+      return false;
+    }
+
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Invalid email format!');
+      return false;
+    }
+
+    return true;
+  };
+
+  // ✅ Input Handler
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // ✅ Submit Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
     try {
+      setLoading(true);
+
       const res = await fetch('http://localhost:5000/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -23,16 +53,20 @@ const ContactPage = () => {
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        alert('Message sent successfully!');
+        toast.success('Message sent successfully!');
         setFormData({ name: '', email: '', subject: '', message: '' });
-          navigate('/feedback')
+
+        setTimeout(() => navigate('/feedback'), 1000);
       } else {
-        alert(data.message || 'Something went wrong.');
+        toast.error(data.message || 'Something went wrong.');
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Server error!');
+      toast.error('Server error!');
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -128,17 +162,43 @@ const ContactPage = () => {
               />
             </div>
 
+            {/* ✅ Submit Button with Spinner */}
             <button
               type="submit"
-              className="bg-yellow-400 hover:bg-yellow-500 transition-colors text-black font-semibold py-2 px-6 rounded-lg"
+              disabled={loading}
+              className={`bg-yellow-400 hover:bg-yellow-500 transition-colors text-black font-semibold py-2 px-6 rounded-lg flex items-center justify-center ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
-              Submit
+              {loading && (
+                <svg
+                  className="animate-spin h-5 w-5 text-black mr-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+              )}
+              {loading ? 'Sending...' : 'Submit'}
             </button>
           </form>
         </div>
       </section>
 
-      {/* Optional Google Map Embed */}
+      {/* Google Map */}
       <section className="mt-10">
         <iframe
           title="Google Map"
@@ -148,6 +208,9 @@ const ContactPage = () => {
           loading="lazy"
         ></iframe>
       </section>
+
+      {/* ✅ Toast Notification Container */}
+      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   );
 };

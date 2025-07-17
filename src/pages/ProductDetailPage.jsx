@@ -32,22 +32,26 @@ const ProductDetailPage = () => {
   if (!product) return <p className="text-center py-20">Loading...</p>;
 
   return (
-    <section className="py-12 px-4 sm:px-8 lg:px-16 max-w-5xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-white rounded-xl shadow-lg overflow-hidden">
+    <section className="py-16 px-4 sm:px-8 lg:px-16 max-w-6xl mx-auto">
+      <div className="py-10 grid grid-cols-1 md:grid-cols-2 gap-12 bg-white rounded-2xl shadow-lg overflow-hidden p-6">
+        {/* 🖼️ Product Images */}
         <div>
           <img
             src={mainImage}
             alt={product.name}
-            className="w-full h-96 object-cover rounded-lg"
+            className="w-full h-[400px] object-cover rounded-xl border"
           />
+
           {product.thumbnails?.length > 0 && (
-            <div className="grid grid-cols-4 gap-2 mt-4">
+            <div className="grid grid-cols-4 gap-3 mt-4">
               {product.thumbnails.map((thumb, i) => (
                 <button key={i} onClick={() => setMainImage(thumb)}>
                   <img
                     src={thumb}
-                    alt={`${product.name} thumb ${i + 1}`}
-                    className="w-full h-20 object-cover rounded-md border-2 border-transparent hover:border-yellow-500 transition"
+                    alt={`${product.name} thumbnail ${i + 1}`}
+                    className={`w-full h-20 object-cover rounded-md border-2 transition ${
+                      mainImage === thumb ? "border-yellow-500" : "border-gray-300"
+                    } hover:border-yellow-400`}
                   />
                 </button>
               ))}
@@ -55,41 +59,48 @@ const ProductDetailPage = () => {
           )}
         </div>
 
-        <div className="p-6 flex flex-col justify-between">
+        {/* 📝 Product Details */}
+        <div className="flex flex-col justify-between">
           <div>
             <h1 className="text-4xl font-extrabold text-gray-900 mb-4">{product.name}</h1>
-            <p className="text-gray-600 mb-6">{product.description}</p>
+            <p className="text-gray-600 mb-6 leading-relaxed">{product.description}</p>
+
             <div className="mb-6">
-              <span className="text-3xl font-bold text-yellow-600">${product.price.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-yellow-500">${product.price.toFixed(2)}</span>
               {product.oldPrice && (
-                <span className="line-through text-gray-500 ml-3">${product.oldPrice.toFixed(2)}</span>
+                <span className="ml-3 text-gray-500 line-through">${product.oldPrice.toFixed(2)}</span>
               )}
             </div>
-            <div className="flex items-center mb-6">
-              <span className="mr-2 font-medium">Qty:</span>
+
+            {/* Quantity */}
+            <div className="flex items-center gap-4 mb-6">
+              <label htmlFor="qty" className="font-medium">Quantity:</label>
               <input
+                id="qty"
                 type="number"
                 min="1"
                 value={quantity}
                 onChange={e => setQuantity(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                className="w-20 px-2 py-1 border rounded-md focus:ring-2 focus:ring-yellow-400"
+                className="w-20 px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="space-y-4">
+          {/* 🛒 Action Buttons */}
+          <div className="space-y-4 mt-6">
             <button
               onClick={handleAddToCart}
-              className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-6 rounded-full transition"
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 px-6 rounded-lg w-full transition"
             >
-              Add to Cart
+              🛒 Add to Cart
             </button>
-            <button className="w-full border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-100 transition">
-              Add to Wishlist
+            <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-100 transition">
+              ❤️ Add to Wishlist
             </button>
-            <div className="text-gray-600 text-sm">
-              <div><strong>SKU:</strong> {product.sku}</div>
-              <div><strong>Category:</strong> {product.category}</div>
+
+            <div className="text-sm text-gray-600 pt-2">
+              <p><strong>SKU:</strong> {product.sku}</p>
+              <p><strong>Category:</strong> {product.category}</p>
             </div>
           </div>
         </div>
