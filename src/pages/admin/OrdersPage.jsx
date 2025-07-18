@@ -6,7 +6,7 @@ const UsersPage = () => {
     <div className="flex">
       <AdminSidebar />
       <div className="ml-64 p-6 w-full">
-        <h2 className="text-2xl font-bold">Manage orders</h2>
+        <h2 className="text-2xl font-bold">Manage orders1</h2>
       </div>
     </div>
   );
