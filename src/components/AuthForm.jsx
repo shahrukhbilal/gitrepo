@@ -1,152 +1,174 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLoginMutation, useRegisterMutation } from '../redux/api';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../redux/authSlice';
-import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import toast from 'react-hot-toast';
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({ fullName: '', email: '', password: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    isAdmin: false,
+  });
 
-  const [login, { isLoading: loggingIn }] = useLoginMutation();
-  const [register, { isLoading: registering }] = useRegisterMutation();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const nameInputRef = useRef(null);
+  const dispatch = useDispatch();
+  const [login] = useLoginMutation();
+  const [register] = useRegisterMutation();
 
   const toggleForm = () => {
     setIsLogin(!isLogin);
-    setFormData({ fullName: '', email: '', password: '' });
-    setTimeout(() => {
-      if (nameInputRef.current) nameInputRef.current.focus();
-    }, 100);
-  };
-
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      isAdmin: false,
+    });
   };
 
   const validateForm = () => {
-    const { fullName, email, password } = formData;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!email || !password || (!isLogin && !fullName)) {
-      toast.error('All fields are required!');
+    if (!formData.email || !formData.password) {
+      toast.error('Email and Password are required');
       return false;
     }
-
-    if (!emailRegex.test(email)) {
-      toast.error('Please enter a valid email address!');
+    if (!isLogin && (!formData.name || !formData.confirmPassword)) {
+      toast.error('All fields are required');
       return false;
     }
-
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters!');
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      toast.error('Passwords do not match');
       return false;
     }
-
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     try {
-      const payload = isLogin
-        ? { email: formData.email, password: formData.password }
-        : { name: formData.fullName, email: formData.email, password: formData.password };
+      if (isLogin) {
+        const res = await login({
+          email: formData.email,
+          password: formData.password,
+        }).unwrap();
 
-      const res = isLogin
-        ? await login(payload).unwrap()
-        : await register(payload).unwrap();
+        dispatch(setCredentials(res));
+        toast.success('Login successful');
 
-      dispatch(setCredentials({ token: res.token, user: res.user }));
-      setFormData({ fullName: '', email: '', password: '' });
-      toast.success(isLogin ? 'Login successful!' : 'Registration successful!');
-      navigate('/my-orders');
-    } catch (err) {
-      toast.error(err?.data?.message || 'Something went wrong.');
+        console.log('🔐 Logged in:', res.user);
+        res.user.isAdmin ? navigate('/admin') : navigate('/my-orders');
+      } else {
+        const payload = {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: formData.isAdmin ? 'admin' : 'user', // ✅ Fix here
+        };
+
+        const res = await register(payload).unwrap();
+
+        dispatch(setCredentials(res));
+        toast.success('Registration successful');
+
+        console.log('✅ Registered:', res.user);
+        res.user.isAdmin ? navigate('/admin') : navigate('/my-orders');
+      }
+    } catch (error) {
+      toast.error(error?.data?.message || 'Something went wrong');
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
-      <div className="bg-white shadow-md rounded-2xl p-8 w-full max-w-md">
-        <h3 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          {isLogin ? '👤 User Login' : '📝 Register'}
-        </h3>
+    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold text-center mb-4">
+        {isLogin ? 'Login' : 'Register'}
+      </h2>
 
-        <form onSubmit={handleSubmit} autoComplete="off" className="space-y-5">
-          {!isLogin && (
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">Full Name</label>
+      <form onSubmit={handleSubmit}>
+        {!isLogin && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium">Name</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full mt-1 p-2 border rounded"
+              required
+            />
+          </div>
+        )}
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Email</label>
+          <input
+            type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="w-full mt-1 p-2 border rounded"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium">Password</label>
+          <input
+            type="password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            className="w-full mt-1 p-2 border rounded"
+            required
+          />
+        </div>
+
+        {!isLogin && (
+          <>
+            <div className="mb-4">
+              <label className="block text-sm font-medium">Confirm Password</label>
               <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                placeholder="Your name"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={(e) =>
+                  setFormData({ ...formData, confirmPassword: e.target.value })
+                }
+                className="w-full mt-1 p-2 border rounded"
                 required
-                autoFocus
-                ref={nameInputRef}
-                autoComplete="off"
               />
             </div>
-          )}
 
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Email Address</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              required
-              autoComplete="off"
-            />
-          </div>
+            <div className="mb-4 flex items-center">
+              <input
+                type="checkbox"
+                checked={formData.isAdmin}
+                onChange={(e) =>
+                  setFormData({ ...formData, isAdmin: e.target.checked })
+                }
+                className="mr-2"
+              />
+              <label className="text-sm">Register as Admin</label>
+            </div>
+          </>
+        )}
 
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              required
-              autoComplete="off"
-            />
-          </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+        >
+          {isLogin ? 'Login' : 'Register'}
+        </button>
+      </form>
 
-          <button
-            type="submit"
-            disabled={loggingIn || registering}
-            className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 rounded-lg transition duration-300"
-          >
-            {loggingIn || registering
-              ? isLogin ? 'Logging in...' : 'Registering...'
-              : isLogin ? 'Login' : 'Register'}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-gray-600 mt-6">
-          {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
-          <button onClick={toggleForm} className="text-yellow-500 font-medium hover:underline">
-            {isLogin ? 'Register' : 'Login'}
-          </button>
-        </p>
-      </div>
-
-      <ToastContainer position="top-center" autoClose={3000} />
+      <p className="mt-4 text-sm text-center">
+        {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
+        <button className="text-blue-600 underline" onClick={toggleForm}>
+          {isLogin ? 'Register' : 'Login'}
+        </button>
+      </p>
     </div>
   );
 };

@@ -14,6 +14,8 @@ import ContactPage from './pages/ContactPage';
 import FeedbackPage from './pages/FeedbackPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AdminLogin from './pages/admin/AdminLogin';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 function App() {
   return (
@@ -34,7 +36,10 @@ function App() {
           <Route path='/about' element={<AboutPage />} />
           <Route path='/contact' element={<ContactPage />} />
           <Route path='/feedback' element={<FeedbackPage />} />
+          <Route path='/admin/login' element={<AdminLogin />}></Route>
+          <Route path='/admin/dashbooard' element={<AdminDashboard/>}></Route>
         </Route>
+        <Route path='/admin' element={<AdminDashboard/>}></Route>
       </Routes>
 
       {/* ✅ Global Toast Container for Notifications */}
