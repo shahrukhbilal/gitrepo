@@ -11,6 +11,7 @@ const productRoutes = require('./routes/productRoutes');
 const orderHandlerRoutes = require('./routes/orderHandlerRoutes');
 const handleLoginRoutes= require('./routes/handleLoginRoutes')
 const contactRoutes= require('./routes/contactRoutes')
+const adminRoutes = require('./routes/adminRoutes')
 connectDB()
 app.use(cors())
 
@@ -24,6 +25,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderHandlerRoutes); 
 app.use('/api/auth', handleLoginRoutes)
 app.use('/api/contact', contactRoutes)
+app.use('/api/admin' , adminRoutes)
 app.listen(PORT, (req, res)=>{
     console.log('server is running ')
 })

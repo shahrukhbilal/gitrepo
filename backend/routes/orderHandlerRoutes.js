@@ -4,14 +4,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const Order = require('../models/orderModel');
-const verifyToken = require('../middleware/authMiddleware');
+const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 
 const isValidObjectId = id =>
   mongoose.Types.ObjectId.isValid(id) &&
   String(new mongoose.Types.ObjectId(id)) === id;
 
 // 🔐 🗓️ Fetch orders only for the logged-in user
-router.get('/my-orders', verifyToken, async (req, res) => {
+router.get('/my-orders', verifyToken, isAdmin,  async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user.userId }).sort({ createdAt: -1 });
     res.status(200).json(orders);
