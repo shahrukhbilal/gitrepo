@@ -11,18 +11,14 @@ const isValidObjectId = id =>
   String(new mongoose.Types.ObjectId(id)) === id;
 
 // 🔐 🗓️ Fetch orders only for the logged-in user
-router.get('/my-orders', verifyToken, isAdmin,  async (req, res) => {
-  try {
-    const orders = await Order.find({ user: req.user.userId }).sort({ createdAt: -1 });
-    res.status(200).json(orders);
-  } catch (err) {
-    console.error('Error fetching user orders:', err);
-    res.status(500).json({ message: 'Failed to fetch your orders' });
-  }
+router.get('/my-orders', verifyToken, async (req, res) => {
+  const orders = await Order.find({ user: req.user._id });
+  res.json(orders);
 });
 
+
 // 🛡️ 📦 Fetch all orders (for admin/testing use only)
-router.get('/admin-orders', async (req, res) => {
+router.get('/admin-orders',verifyToken, isAdmin, async (req, res) => {
   try {
     const { email } = req.query;
     const query = email ? { email } : {};
@@ -73,7 +69,7 @@ router.post('/', verifyToken, async (req, res) => {
     }));
 
     const newOrder = new Order({
-      user: req.user.userId, // 🔐 Link order to user
+      user: req.user.id, // 🔐 Link order to user
       fullName,
       email,
       phone,
