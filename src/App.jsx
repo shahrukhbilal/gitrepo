@@ -12,38 +12,49 @@ import Shop from './pages/Shop';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import FeedbackPage from './pages/FeedbackPage';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminProducts from './pages/admin/AdminProducts';
+import AdminOrders from './pages/admin/AdminOrders';
+import AdminUsers from './pages/admin/AdminUsers';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// ✅ Admin Layout includes Sidebar + nested page
+import AdminLayout from './pages/admin/AdminLayout';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* 🏠 Home page with full layout */}
-        <Route path='/' element={<MainLayout />} />
 
-        {/* 🧭 All other pages with simple layout */}
+        {/* 🏠 Public Website Routes */}
+        <Route path="/" element={<MainLayout />} />
         <Route element={<SimpleLayout />}>
-          <Route path='/product/:slug' element={<ProductDetailPage />} />
-          <Route path='/cart' element={<CartPage />} />
-          <Route path='/checkout' element={<CheckoutPage />} />
-          <Route path='/thankyou' element={<ThankYouPage />} />
-          <Route path='/my-orders' element={<MyOrdersPage />} />
-          <Route path='/login' element={<AuthForm />} />
-          <Route path='/shop' element={<Shop />} />
-          <Route path='/about' element={<AboutPage />} />
-          <Route path='/contact' element={<ContactPage />} />
-          <Route path='/feedback' element={<FeedbackPage />} />
-          <Route path='/admin/login' element={<AdminLogin />}></Route>
-          <Route path='/admin/dashbooard' element={<AdminDashboard/>}></Route>
+          <Route path="/product/:slug" element={<ProductDetailPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/thankyou" element={<ThankYouPage />} />
+          <Route path="/my-orders" element={<MyOrdersPage />} />
+          <Route path="/login" element={<AuthForm />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/feedback" element={<FeedbackPage />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
         </Route>
-        <Route path='/admin' element={<AdminDashboard/>}></Route>
+
+        {/* 🛠️ Admin Panel Routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} /> {/* /admin */}
+          <Route path="products" element={<AdminProducts />} /> {/* /admin/products */}
+          <Route path="orders" element={<AdminOrders />} />     {/* /admin/orders */}
+          <Route path="users" element={<AdminUsers />} />       {/* /admin/users */}
+        </Route>
       </Routes>
 
-      {/* ✅ Global Toast Container for Notifications */}
-      <ToastContainer position='top-right' autoClose={3000} />
+      {/* ✅ Toast Notification Container */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </Router>
   );
 }

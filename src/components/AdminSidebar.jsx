@@ -1,18 +1,66 @@
-// src/admin/Sidebar.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  Package,
+  Users,
+  ShoppingCart,
+  Mail,
+  ArrowLeftCircle,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 
 function AdminSidebar() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  const menuItems = [
+    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
+    { name: 'Products', icon: <Package size={20} />, path: '/admin/products' },
+    { name: 'Users', icon: <Users size={20} />, path: '/admin/users' },
+    { name: 'Orders', icon: <ShoppingCart size={20} />, path: '/admin/orders' },
+    { name: 'Messages', icon: <Mail size={20} />, path: '/admin/messages' },
+    { name: 'Back to Site', icon: <ArrowLeftCircle size={20} />, path: '/' },
+  ];
+
   return (
-    <div className="w-90 min-h-screen bg-gray-900 text-white p-4">
-      <h2 className="text-2xl font-bold mb-8 text-center">Admin Panel</h2>
-      <ul className="space-y-4">
-        <li><Link to="/admin/dashboard" className="hover:text-yellow-400">Dashboard</Link></li>
-        <li><Link to="/admin/products" className="hover:text-yellow-400">Products</Link></li>
-        <li><Link to="/admin/users" className="hover:text-yellow-400">Users</Link></li>
-        <li><Link to="/admin/orders" className="hover:text-yellow-400">Orders</Link></li>
-        <li><Link to="/admin/messages" className="hover:text-yellow-400">Messages</Link></li>
-        <li><Link to="/" className="hover:text-yellow-400">Back to Site</Link></li>
+    <div
+      className={`${
+        isCollapsed ? 'w-20' : 'w-64'
+      } bg-gray-900 text-white min-h-screen p-4 transition-all duration-300`}
+    >
+      {/* Toggle Button */}
+      <div className="flex justify-end mb-6">
+        <button
+          onClick={toggleSidebar}
+          className="text-white hover:text-yellow-400 transition duration-200"
+        >
+          {isCollapsed ? <ChevronRight size={24} /> : <ChevronLeft size={24} />}
+        </button>
+      </div>
+
+      {/* Sidebar Title */}
+      {!isCollapsed && (
+        <h2 className="text-2xl font-bold mb-8 text-center">Admin Panel</h2>
+      )}
+
+      {/* Menu Items */}
+      <ul className="space-y-6">
+        {menuItems.map((item, index) => (
+          <li key={index}>
+            <Link
+              to={item.path}
+              className="flex items-center space-x-3 hover:text-yellow-400"
+            >
+              {item.icon}
+              {!isCollapsed && <span>{item.name}</span>}
+            </Link>
+          </li>
+        ))}
       </ul>
     </div>
   );

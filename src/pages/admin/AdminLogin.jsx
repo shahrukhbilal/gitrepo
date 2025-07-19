@@ -10,28 +10,29 @@ function AdminLogin() {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    try {
-      const res = await fetch('http://localhost:5000/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
+  e.preventDefault()
+  try {
+    const res = await fetch('http://localhost:5000/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    })
 
-      const data = await res.json()
+    const data = await res.json()
 
-      if (res.ok) {
-        localStorage.setItem('adminToken', data.token)
-        alert('Login successful')
-        navigate('/admin/dashboard')
-      } else {
-        alert(data.message || 'Login failed')
-      }
-    } catch (err) {
-      console.error('Login error:', err)
-      alert('Something went wrong')
+    if (res.ok) {
+      localStorage.setItem('token', data.token) // ✅ FIXED HERE
+      alert('Login successful')
+      navigate('/admin/dashboard')
+    } else {
+      alert(data.message || 'Login failed')
     }
+  } catch (err) {
+    console.error('Login error:', err)
+    alert('Something went wrong')
   }
+}
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -40,6 +41,7 @@ function AdminLogin() {
 
         <input
           type="email"
+
           name="email"
           placeholder="Email"
           value={formData.email}

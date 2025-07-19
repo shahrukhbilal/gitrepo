@@ -1,19 +1,17 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import AdminDashboard from '../pages/admin/AdminDashboard';
-import UsersPage from '../pages/admin/UsersPage';
-import OrdersPage from '../pages/admin/OrdersPage';
-import ProductsPage from '../pages/admin/ProductsPage';
+// // src/pages/admin/AdminLayout.jsx
+// import React from 'react';
+// import AdminSidebar from '../../components/AdminSidebar';
+// import { Outlet } from 'react-router-dom';
 
-const AdminRoutes = () => {
-  return (
-    <Routes>
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/users" element={<UsersPage />} />
-      <Route path="/admin/products" element={<ProductsPage />} />
-      <Route path="/admin/orders" element={<OrdersPage />} />
-    </Routes>
-  );
-};
+// const AdminLayout = () => {
+//   return (
+//     <div className="flex min-h-screen bg-gray-100">
+//       <AdminSidebar />
+//       <div className="flex-1 p-6">
+//         <Outlet />
+//       </div>
+//     </div>
+//   );
+// };
 
-export default AdminRoutes;
+// export default AdminLayout;

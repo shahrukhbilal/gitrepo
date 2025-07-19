@@ -1,19 +1,60 @@
-import React from 'react';
-import AdminSidebar from '../../components/AdminSidebar';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+
+  // ✅ Redux auth state se token & user le rahe hain
+  const { user, token } = useSelector((state) => state.auth);
+
+  const [adminData, setAdminData] = useState(null);
+
+  useEffect(() => {
+    // ✅ Unauthorized user ko redirect karo
+    if (!user || !user.isAdmin) {
+      navigate('/login');
+      return;
+    }
+
+    // ✅ Admin data fetch
+    const fetchAdminData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/admin/profile', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // ✅ Proper Bearer token
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch admin data');
+        }
+
+        const data = await response.json();
+        setAdminData(data);
+      } catch (error) {
+        console.error('Admin fetch error:', error.message);
+      }
+    };
+
+    fetchAdminData();
+  }, [user, token, navigate]);
+
   return (
-    <div className="flex">
-      <AdminSidebar />
-      <div className="ml-30 p-6 w-400">
-        <h1 className="text-3xl font-semibold mb-6">Welcome to Admin Dashboard</h1>
-        {/* Future: Add cards/analytics here */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-4 rounded shadow">Users</div>
-          <div className="bg-white p-4 rounded shadow">Orders</div>
-          <div className="bg-white p-4 rounded shadow">Products</div>
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
+
+      {adminData ? (
+        <div className="bg-white p-4 rounded shadow">
+          <p><strong>Name:</strong> {adminData.name}</p>
+          <p><strong>Email:</strong> {adminData.email}</p>
+          <p><strong>Admin ID:</strong> {adminData._id}</p>
         </div>
-      </div>
+      ) : (
+        <p>Loading admin data...</p>
+      )}
     </div>
   );
 };
