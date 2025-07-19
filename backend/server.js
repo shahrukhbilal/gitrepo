@@ -12,6 +12,7 @@ const orderHandlerRoutes = require('./routes/orderHandlerRoutes');
 const handleLoginRoutes= require('./routes/handleLoginRoutes')
 const contactRoutes= require('./routes/contactRoutes')
 const adminRoutes = require('./routes/adminRoutes')
+
 connectDB()
 app.use(cors())
 
