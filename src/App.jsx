@@ -12,7 +12,7 @@ import Shop from './pages/Shop';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import FeedbackPage from './pages/FeedbackPage';
-import AdminLogin from './pages/admin/AdminLogin';
+// import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
@@ -22,6 +22,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // ✅ Admin Layout includes Sidebar + nested page
 import AdminLayout from './pages/admin/AdminLayout';
+import AdminShipOrder from './pages/admin/AdminShipOrder';
 
 function App() {
   return (
@@ -41,7 +42,7 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/feedback" element={<FeedbackPage />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
+          {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
         </Route>
 
         {/* 🛠️ Admin Panel Routes */}
@@ -51,6 +52,9 @@ function App() {
           <Route path="orders" element={<AdminOrders />} />     {/* /admin/orders */}
           <Route path="users" element={<AdminUsers />} />       {/* /admin/users */}
         </Route>
+
+<Route path="/admin/orders/ship/:id" element={<AdminShipOrder />} />
+
       </Routes>
 
       {/* ✅ Toast Notification Container */}

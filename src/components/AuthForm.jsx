@@ -68,7 +68,7 @@ const AuthForm = () => {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          role: formData.isAdmin ? 'admin' : 'user', // ✅ Fix here
+          // role: formData.isAdmin ? 'admin' : 'user', // ✅ Fix here
         };
 
         const res = await register(payload).unwrap();

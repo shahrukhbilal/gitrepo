@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -10,23 +10,23 @@ const AdminOrders = () => {
 
   useEffect(() => {
     if (!user?.isAdmin) {
-      navigate('/');
+      navigate("/");
       return;
     }
     fetchOrders();
   }, [user, navigate]);
 
   const fetchOrders = async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     try {
-      const response = await fetch('http://localhost:5000/api/admin/orders', {
+      const response = await fetch("http://localhost:5000/api/admin/orders", {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!response.ok) throw new Error('Failed to fetch orders');
+      if (!response.ok) throw new Error("Failed to fetch orders");
       const data = await response.json();
       setOrders(data);
     } catch (error) {
@@ -35,18 +35,21 @@ const AdminOrders = () => {
   };
 
   const handleStatusChange = async (orderId, newStatus) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/orders/${orderId}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
+      const res = await fetch(
+        `http://localhost:5000/api/admin/orders/${orderId}/status`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
 
-      if (!res.ok) throw new Error('Failed to update status');
+      if (!res.ok) throw new Error("Failed to update status");
 
       // ✅ Update local UI
       setOrders((prevOrders) =>
@@ -57,26 +60,29 @@ const AdminOrders = () => {
 
       toast.success(`Status updated to "${newStatus}"`);
     } catch (error) {
-      console.error('Error updating status:', error);
-      toast.error('Failed to update order status');
+      console.error("Error updating status:", error);
+      toast.error("Failed to update order status");
     }
   };
 
   const handleDelete = async (orderId) => {
-    if (!window.confirm('Are you sure you want to delete this order?')) return;
+    if (!window.confirm("Are you sure you want to delete this order?")) return;
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/orders/${orderId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/admin/orders/${orderId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      if (!response.ok) throw new Error('Failed to delete order');
+      if (!response.ok) throw new Error("Failed to delete order");
 
-      toast.success('Order deleted successfully!');
+      toast.success("Order deleted successfully!");
       fetchOrders();
     } catch (error) {
       toast.error(error.message);
@@ -86,16 +92,16 @@ const AdminOrders = () => {
   // 🔵 Utility for status badge color
   const getStatusBadgeClass = (status) => {
     switch (status) {
-      case 'delivered':
-        return 'bg-green-500 text-white';
-      case 'shipped':
-        return 'bg-blue-500 text-white';
-      case 'processing':
-        return 'bg-yellow-500 text-white';
-      case 'cancelled':
-        return 'bg-red-500 text-white';
+      case "delivered":
+        return "bg-green-500 text-white";
+      case "shipped":
+        return "bg-blue-500 text-white";
+      case "processing":
+        return "bg-yellow-500 text-white";
+      case "cancelled":
+        return "bg-red-500 text-white";
       default:
-        return 'bg-gray-300 text-gray-800';
+        return "bg-gray-300 text-gray-800";
     }
   };
 
@@ -124,8 +130,12 @@ const AdminOrders = () => {
               {orders.map((order) => (
                 <tr key={order._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">{order._id}</td>
-                  <td className="px-6 py-4">{order.user?.name || order.fullName}</td>
-                  <td className="px-6 py-4">{order.user?.email || order.email}</td>
+                  <td className="px-6 py-4">
+                    {order.user?.name || order.fullName}
+                  </td>
+                  <td className="px-6 py-4">
+                    {order.user?.email || order.email}
+                  </td>
                   <td className="px-6 py-4">
                     <ul className="list-disc list-inside space-y-1">
                       {order.items.map((item, index) => (
@@ -143,15 +153,21 @@ const AdminOrders = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div
-                      className={`inline-block px-2 py-1 rounded text-xs font-medium ${getStatusBadgeClass(order.status)}`}
+                      className={`inline-block px-2 py-1 rounded text-xs font-medium ${getStatusBadgeClass(
+                        order.status
+                      )}`}
                     >
                       {order.status}
                     </div>
                     <div className="mt-2">
                       <select
                         value={order.status}
-                        onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                        disabled={['delivered', 'cancelled'].includes(order.status)}
+                        onChange={(e) =>
+                          handleStatusChange(order._id, e.target.value)
+                        }
+                        disabled={["delivered", "cancelled"].includes(
+                          order.status
+                        )}
                         className="border border-gray-300 rounded px-2 py-1 text-xs"
                       >
                         <option value="pending">Pending</option>
@@ -168,6 +184,16 @@ const AdminOrders = () => {
                       className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs"
                     >
                       Delete
+                    </button>
+                  </td>
+                  <td className="px-6 py-4">
+                    <button
+                      className="bg-green-600 text-white px-3 py-1 rounded"
+                      onClick={() =>
+                        navigate(`/admin/orders/ship/${order._id}`)
+                      }
+                    >
+                      Ship Now
                     </button>
                   </td>
                 </tr>
