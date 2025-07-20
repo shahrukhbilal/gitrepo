@@ -9,12 +9,17 @@ const {
   getDashboardStats,
   deleteOrder,
   updateOrderStatus,
+  getSingleOrder
 } = require('../controllers/adminController');
 
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 
 // All routes below are verifyTokened and for admin only
 router.put('/orders/:id/status', verifyToken, isAdmin, updateOrderStatus);
+
+// Route for single order by id 
+router.get('/orders/:id', verifyToken, isAdmin, getSingleOrder);
+
 
 // 🔐 Get all users
 router.get('/users', verifyToken, isAdmin, getAllUsers);
