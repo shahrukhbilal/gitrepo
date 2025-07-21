@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useLoginMutation, useRegisterMutation } from '../redux/api';
-import { useDispatch } from 'react-redux';
 import { setCredentials } from '../redux/authSlice';
-import toast from 'react-hot-toast';
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -29,6 +29,11 @@ const AuthForm = () => {
       confirmPassword: '',
       isAdmin: false,
     });
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validateForm = () => {
@@ -60,23 +65,18 @@ const AuthForm = () => {
 
         dispatch(setCredentials(res));
         toast.success('Login successful');
-
-        console.log('🔐 Logged in:', res.user);
+        setFormData({ name: '', email: '', password: '', confirmPassword: '', isAdmin: false });
         res.user.isAdmin ? navigate('/admin') : navigate('/my-orders');
       } else {
-        const payload = {
+        const res = await register({
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          // role: formData.isAdmin ? 'admin' : 'user', // ✅ Fix here
-        };
-
-        const res = await register(payload).unwrap();
+        }).unwrap();
 
         dispatch(setCredentials(res));
         toast.success('Registration successful');
-
-        console.log('✅ Registered:', res.user);
+        setFormData({ name: '', email: '', password: '', confirmPassword: '', isAdmin: false });
         res.user.isAdmin ? navigate('/admin') : navigate('/my-orders');
       }
     } catch (error) {
@@ -85,94 +85,91 @@ const AuthForm = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-center mb-4">
-        {isLogin ? 'Login' : 'Register'}
-      </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-gray-900 to-gray-700">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
+          {isLogin ? 'Login to your account' : 'Create a new account'}
+        </h2>
 
-      <form onSubmit={handleSubmit} autoComplete='off'>
-      
-        {!isLogin && (
-          <div className="mb-4">
-            <label className="block text-sm font-medium">Name</label>
+        <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
+          {!isLogin && (
             <input
               type="text"
-              autoComplete='off'
+              name="name"
+              placeholder="Full Name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full mt-1 p-2 border rounded"
-              required
+              onChange={handleChange}
+              autoComplete="off"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-        )}
+          )}
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Email</label>
           <input
             type="email"
-            autoComplete='off'
+            name="email"
+            placeholder="Email address"
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full mt-1 p-2 border rounded"
-            required
+            onChange={handleChange}
+            autoComplete="off"
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </div>
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Password</label>
           <input
             type="password"
+            name="password"
+            placeholder="Password"
             value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="w-full mt-1 p-2 border rounded"
-            required
+            onChange={handleChange}
+            autoComplete="new-password"
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </div>
 
-        {!isLogin && (
-          <>
-            <div className="mb-4">
-              <label className="block text-sm font-medium">Confirm Password</label>
-              <input
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) =>
-                  setFormData({ ...formData, confirmPassword: e.target.value })
-                }
-                className="w-full mt-1 p-2 border rounded"
-                required
-              />
-            </div>
+          {!isLogin && (
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              autoComplete="new-password"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          )}
 
-            <div className="mb-4 flex items-center">
-              <input
-                type="checkbox"
-                checked={formData.isAdmin}
-                onChange={(e) =>
-                  setFormData({ ...formData, isAdmin: e.target.checked })
-                }
-                className="mr-2"
-              />
-              <label className="text-sm">Register as Admin</label>
-            </div>
-          </>
-        )}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+          >
+            {isLogin ? 'Login' : 'Register'}
+          </button>
+        </form>
 
-        <button
-          type="submit"
-
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
-        >
-          {isLogin ? 'Login' : 'Register'}
-        </button>
-      </form>
-
-      <p className="mt-4 text-sm text-center">
-        {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
-        <button className="text-blue-600 underline" onClick={toggleForm}>
-          {isLogin ? 'Register' : 'Login'}
-        </button>
-      </p>
+        <p className="text-center mt-4 text-sm text-gray-600">
+          {isLogin ? (
+            <>
+              Don't have an account?{' '}
+              <button
+                type="button"
+                onClick={toggleForm}
+                className="text-blue-500 font-medium hover:underline"
+              >
+                Register
+              </button>
+            </>
+          ) : (
+            <>
+              Already registered?{' '}
+              <button
+                type="button"
+                onClick={toggleForm}
+                className="text-blue-500 font-medium hover:underline"
+              >
+                Login
+              </button>
+            </>
+          )}
+        </p>
+      </div>
     </div>
   );
 };
