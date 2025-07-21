@@ -19,14 +19,16 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminUsers from './pages/admin/AdminUsers';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
 // ✅ Admin Layout includes Sidebar + nested page
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminShipOrder from './pages/admin/AdminShipOrder';
+import ErrorBoundary from './ErrorBoundary';
+import AdminMessages from './pages/AdminMessages';
 
 function App() {
   return (
     <Router>
+      <ErrorBoundary>
       <Routes>
 
         {/* 🏠 Public Website Routes */}
@@ -46,19 +48,24 @@ function App() {
         </Route>
 
         {/* 🛠️ Admin Panel Routes */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} /> {/* /admin */}
-          <Route path="products" element={<AdminProducts />} /> {/* /admin/products */}
-          <Route path="orders" element={<AdminOrders />} />     {/* /admin/orders */}
-          <Route path="users" element={<AdminUsers />} />       {/* /admin/users */}
-        </Route>
+       <Route path="/admin" element={<AdminLayout />}>
+  <Route index element={<AdminDashboard />} />
+  <Route path="products" element={<AdminProducts />} />
+  <Route path="orders" element={<AdminOrders />} />
+  <Route path="users" element={<AdminUsers />} />
+  <Route path="stats" element={<AdminDashboard />} />
+<Route path="contacts" element={<AdminMessages />} />
+
+</Route>
 
 <Route path="/admin/orders/ship/:id" element={<AdminShipOrder />} />
+
 
       </Routes>
 
       {/* ✅ Toast Notification Container */}
       <ToastContainer position="top-right" autoClose={3000} />
+      </ErrorBoundary>
     </Router>
   );
 }

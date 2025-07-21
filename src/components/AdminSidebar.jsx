@@ -19,11 +19,11 @@ function AdminSidebar() {
   };
 
   const menuItems = [
-    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
+    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/stats' },
     { name: 'Products', icon: <Package size={20} />, path: '/admin/products' },
     { name: 'Users', icon: <Users size={20} />, path: '/admin/users' },
     { name: 'Orders', icon: <ShoppingCart size={20} />, path: '/admin/orders' },
-    { name: 'Messages', icon: <Mail size={20} />, path: '/admin/messages' },
+    { name: 'Feedback', icon: <Mail size={20} />, path: '/admin/contacts' },
     { name: 'Back to Site', icon: <ArrowLeftCircle size={20} />, path: '/' },
   ];
 
