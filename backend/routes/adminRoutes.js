@@ -3,45 +3,31 @@ const router = express.Router();
 
 const {
   getAllUsers,
-  getAllOrders,
   getAllProducts,
-  deleteUser,
-  getDashboardStats,
+  getAllOrders,
+  getSingleOrder,
   deleteOrder,
+  deleteUser,
   updateOrderStatus,
-  getSingleOrder
+  getDashboardStats,
 } = require('../controllers/adminController');
 
 const { verifyToken, isAdmin } = require('../middleware/authMiddleware');
 
-// All routes below are verifyTokened and for admin only
-router.put('/orders/:id/status', verifyToken, isAdmin, updateOrderStatus);
-
-// Route for single order by id 
-router.get('/orders/:id', verifyToken, isAdmin, getSingleOrder);
-
-
-// 🔐 Get all users
+// ✅ USERS ROUTES
 router.get('/users', verifyToken, isAdmin, getAllUsers);
-
-// 🔐 Delete a user
 router.delete('/users/:id', verifyToken, isAdmin, deleteUser);
 
-// 🔐 Get all orders
-router.get('/orders', verifyToken, isAdmin, getAllOrders);
-
-// 🔐 Delete orders by id 
-router.delete('/orders/:id', verifyToken, isAdmin, deleteOrder);
-
-// 🔐 update orders by id 
-router.put('/orders/:id', verifyToken, isAdmin, deleteOrder);
-
-// 🔐 Get all products
+// ✅ PRODUCTS ROUTES
 router.get('/products', verifyToken, isAdmin, getAllProducts);
 
-router.get('/dashboard-stats', verifyToken, isAdmin, getDashboardStats);
+// ✅ ORDERS ROUTES
+router.get('/orders', verifyToken, isAdmin, getAllOrders);
+router.get('/orders/:id', verifyToken, isAdmin, getSingleOrder);
+router.delete('/orders/:id', verifyToken, isAdmin, deleteOrder);
+router.put('/orders/:id/status', verifyToken, isAdmin, updateOrderStatus);
 
-router.get('/profile', verifyToken, (req, res) => {
-  res.status(200).json(req.admin); // If admin logged in
-});
+// ✅ DASHBOARD ROUTE
+router.get('/stats', verifyToken, isAdmin, getDashboardStats);
+
 module.exports = router;
