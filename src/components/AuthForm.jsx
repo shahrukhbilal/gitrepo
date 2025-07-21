@@ -90,12 +90,14 @@ const AuthForm = () => {
         {isLogin ? 'Login' : 'Register'}
       </h2>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} autoComplete='off'>
+      
         {!isLogin && (
           <div className="mb-4">
             <label className="block text-sm font-medium">Name</label>
             <input
               type="text"
+              autoComplete='off'
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full mt-1 p-2 border rounded"
@@ -108,6 +110,7 @@ const AuthForm = () => {
           <label className="block text-sm font-medium">Email</label>
           <input
             type="email"
+            autoComplete='off'
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             className="w-full mt-1 p-2 border rounded"
@@ -157,6 +160,7 @@ const AuthForm = () => {
 
         <button
           type="submit"
+
           className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
         >
           {isLogin ? 'Login' : 'Register'}

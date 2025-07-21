@@ -24,6 +24,8 @@ import AdminLayout from './pages/admin/AdminLayout';
 import AdminShipOrder from './pages/admin/AdminShipOrder';
 import ErrorBoundary from './ErrorBoundary';
 import AdminMessages from './pages/AdminMessages';
+import Products  from './pages/admin/Products';
+
 
 function App() {
   return (
@@ -50,12 +52,12 @@ function App() {
         {/* 🛠️ Admin Panel Routes */}
        <Route path="/admin" element={<AdminLayout />}>
   <Route index element={<AdminDashboard />} />
-  <Route path="products" element={<AdminProducts />} />
+  <Route path="products" element={<Products />} />
   <Route path="orders" element={<AdminOrders />} />
   <Route path="users" element={<AdminUsers />} />
   <Route path="stats" element={<AdminDashboard />} />
 <Route path="contacts" element={<AdminMessages />} />
-
+<Route path='back' element={<MainLayout></MainLayout>}> </Route>
 </Route>
 
 <Route path="/admin/orders/ship/:id" element={<AdminShipOrder />} />

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+
 import {
   LayoutDashboard,
   Package,
@@ -10,13 +11,14 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { logout } from '../redux/authSlice';
 
 function AdminSidebar() {
+    const dispatch= useDispatch()
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
   const menuItems = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/stats' },
@@ -24,7 +26,7 @@ function AdminSidebar() {
     { name: 'Users', icon: <Users size={20} />, path: '/admin/users' },
     { name: 'Orders', icon: <ShoppingCart size={20} />, path: '/admin/orders' },
     { name: 'Feedback', icon: <Mail size={20} />, path: '/admin/contacts' },
-    { name: 'Back to Site', icon: <ArrowLeftCircle size={20} />, path: '/' },
+    { name: 'Back to Site', icon: <ArrowLeftCircle size={20} />, path: '/', logout: true },
   ];
 
   return (
@@ -54,6 +56,12 @@ function AdminSidebar() {
           <li key={index}>
             <Link
               to={item.path}
+              onClick={() => {
+                if (item.logout) {
+                  localStorage.removeItem('token');
+                  dispatch(logout())
+                }
+              }}
               className="flex items-center space-x-3 hover:text-yellow-400"
             >
               {item.icon}
