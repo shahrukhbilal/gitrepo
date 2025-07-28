@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { addToCart } from '../redux/cartSlice'; // ✅ Important: import the action
-import { ShoppingCart } from 'lucide-react';   // or any Lucide cart icon
+import { addToCart } from '../redux/cartSlice';
+import { ShoppingCart } from 'lucide-react';
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
@@ -13,11 +13,11 @@ const ProductCard = ({ product }) => {
   return (
     <div className="border rounded-xl p-4 hover:shadow-lg transition">
       <img
-        src={product.image}
-        alt={product.name}
+        src={product.images?.[0]} // ✅ show first image in the array
+  alt={product.title}
         className="w-full h-48 object-cover rounded-md"
       />
-      <h3 className="mt-2 text-lg font-bold">{product.name}</h3>
+      <h3 className="mt-2 text-lg font-bold">{product.title}</h3> {/* ✅ updated */}
       <p className="text-gray-600">{product.category}</p>
       <p className="text-xl font-semibold text-green-600">Rs. {product.price}</p>
 

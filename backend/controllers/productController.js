@@ -1,75 +1,127 @@
+// Import the Product and FeaturedCategory models
 const Product = require('../models/productModel');
 const FeaturedCategory = require('../models/featuredCategoryModel');
-// Create product
+
+// =========================================
+// 🔵 CREATE PRODUCT FUNCTION
+// =========================================
 const createProduct = async (req, res) => {
   try {
-    const { name, slug, description, image, price, stock, category } = req.body;
-    const product = await Product.create({ name, slug, description, image, price, stock, category });
-    res.status(201).json(product);
+    // Destructure required fields from request body
+    const {
+      title,
+      slug,
+      category,
+      price,
+      stock,
+      description,
+      sizes,
+      images // images will be an array of image URLs
+    } = req.body;
+
+    // 📝 Create a new product instance using the Product model
+    const product = new Product({
+      title,
+      slug,
+      category,
+      price,
+      stock,
+      description,
+      sizes,
+      images // should be an array like ['url1', 'url2']
+    });
+
+    // 💾 Save product to database
+    const savedProduct = await product.save();
+
+    // ✅ Send success response
+    res.status(201).json(savedProduct);
   } catch (error) {
+    // ❌ Handle and send any error that occurs
     console.error('Error creating product:', error);
-    res.status(400).json({ message: 'Failed to create product' });
+    res.status(400).json({ message: 'Product creation failed', error });
   }
 };
 
-
-// Get all products with optional filtering and sorting
+// =========================================
+// 🟠 GET ALL PRODUCTS WITH FILTERING
+// =========================================
 const getAllProducts = async (req, res) => {
   try {
+    // Extract filters from query params (optional)
     const { category, min, max, sort } = req.query;
 
-    const filter = {};
+    const filter = {}; // 🧱 Initialize empty MongoDB query object
 
-    // 🟨 Log the incoming query
-    console.log('🔍 Incoming query params:', req.query);
+    console.log('🔍 Incoming query params:', req.query); // Log for debugging
 
-    // Convert category slug to ID
+    // ✅ If category slug is passed, find its corresponding _id
     if (category) {
       const categoryDoc = await FeaturedCategory.findOne({ slug: category });
       if (categoryDoc) {
         filter.category = categoryDoc._id;
       } else {
         console.log('❌ No category matched for slug:', category);
-        return res.status(200).json([]);
+        return res.status(200).json([]); // No products if invalid category
       }
     }
 
+    // 💰 Handle price filtering
     if (min || max) filter.price = {};
-    if (min) filter.price.$gte = Number(min);
-    if (max) filter.price.$lte = Number(max);
+    if (min) filter.price.$gte = Number(min); // greater than equal to
+    if (max) filter.price.$lte = Number(max); // less than equal to
 
-    // 🧱 Log the final filter object
-    console.log('🧱 Final MongoDB filter:', filter);
+    console.log('🧱 Final MongoDB filter:', filter); // Final filter object
 
-    let query = Product.find(filter);
+    let query = Product.find(filter); // Create initial Mongoose query
 
-    if (sort === 'low') query = query.sort({ price: 1 });
-    else if (sort === 'high') query = query.sort({ price: -1 });
-    else query = query.sort({ createdAt: -1 });
+    // 🔃 Apply sorting logic
+    if (sort === 'low') query = query.sort({ price: 1 }); // low to high
+    else if (sort === 'high') query = query.sort({ price: -1 }); // high to low
+    else query = query.sort({ createdAt: -1 }); // default: newest first
 
-    const products = await query.populate('category', 'name slug'); // Optional
+    // 📦 Populate category details inside each product
+    const products = await query.populate('category', 'name slug');
 
+    // ✅ Return the final result
     res.status(200).json(products);
   } catch (error) {
+    // ❌ Catch any unexpected errors
     console.error('❌ Error fetching filtered products:', error);
     res.status(500).json({ message: 'Failed to fetch products' });
   }
 };
+
+// =========================================
+// 🟢 GET SINGLE PRODUCT BY SLUG
+// =========================================
 const getProductBySlug = async (req, res) => {
   try {
-    const product = await Product.findOne({ slug: req.params.slug }).populate('category', 'name slug');
+    // Find product where slug matches URL param, also populate category name + slug
+    const product = await Product.findOne({ slug: req.params.slug }).populate(
+      'category',
+      'name slug'
+    );
+
+    // ❌ If not found, return 404
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
+
+    // ✅ Return the found product
     res.status(200).json(product);
   } catch (error) {
+    // ❌ Catch error
     console.error('❌ Error fetching product by slug:', error);
     res.status(500).json({ message: 'Failed to fetch product' });
   }
 };
 
+// =========================================
+// EXPORT CONTROLLERS
+// =========================================
 module.exports = {
   createProduct,
   getAllProducts,
-  getProductBySlug, 
+  getProductBySlug,
 };

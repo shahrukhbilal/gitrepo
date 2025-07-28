@@ -12,6 +12,8 @@ const orderHandlerRoutes = require('./routes/orderHandlerRoutes');
 const handleLoginRoutes= require('./routes/handleLoginRoutes')
 const contactRoutes= require('./routes/contactRoutes')
 const adminRoutes = require('./routes/adminRoutes')
+const paymentRoutes = require("./routes/paymentRoutes");
+const stripeOrderRoutes= require('./routes/stripeOrderRoutes')
 
 connectDB()
 app.use(cors())
@@ -27,6 +29,11 @@ app.use('/api/orders', orderHandlerRoutes);
 app.use('/api/auth', handleLoginRoutes)
 app.use('/api/contact', contactRoutes)
 app.use('/api/admin' , adminRoutes)
+app.use("/api/payment", paymentRoutes);
+app.use('/api/stripe-orders',stripeOrderRoutes);
+
+
+
 app.listen(PORT, (req, res)=>{
     console.log('server is running ')
 })

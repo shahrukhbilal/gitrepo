@@ -1,118 +1,95 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 const CheckoutPage = () => {
-  const cartItems = useSelector(state => state.cart.items);
-  const token = useSelector(state => state.auth.token); // ✅ Correct way
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const stripe = useStripe();
+  const elements = useElements();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    fullName: '', email: '', phone: '',
-    address: '', city: '', zip: '',
-    paymentMethod: 'cash'
-  });
+  const cartItems = useSelector((state) => state.cart.items || []);
 
-  const handleChange = e =>
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+const totalAmount = cartItems.reduce(
+  (sum, item) => sum + item.price * item.quantity,
+  0
+);
 
-  const handleSubmit = async e => {
+  const { user } = useSelector((state) => state.auth); // assuming auth slice
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!cartItems.length) {
-      alert('Your cart is empty.');
-      return;
-    }
 
-    const orderData = {
-      fullName: form.fullName,
-      email: form.email,
-      phone: form.phone,
-      address: form.address,
-      city: form.city,
-      zip: form.zip,
-      paymentMethod: form.paymentMethod,
-      items: cartItems.map(item => ({
-        productId: item._id,
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-      })),
-      total
-    };
+    if (!stripe || !elements) return;
 
-    console.log("Order data being sent:", orderData);
+    setLoading(true);
+    setError(null);
 
     try {
-      const res = await fetch("http://localhost:5000/api/orders", {
-        method: "POST",
+      const res = await fetch('http://localhost:5000/api/payment/create-payment-intent', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // ✅ This will now work
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user?.token}`, // include if using JWT
         },
-        body: JSON.stringify(orderData),
+        body: JSON.stringify({ amount: totalAmount * 100 }), // Stripe requires amount in cents
       });
 
-      const data = await res.json();
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || 'Failed to create payment intent');
+      }
 
-      if (res.ok) {
-        alert('✅ Order Placed Successfully!');
+      const { clientSecret } = await res.json();
+
+      const result = await stripe.confirmCardPayment(clientSecret, {
+  payment_method: {
+    card: elements.getElement(CardElement),
+    billing_details: { name: 'Your Name' },
+  },
+});
+
+      if (result.error) {
+        setError(result.error.message);
+      } else if (result.paymentIntent.status === 'succeeded') {
         navigate('/thankyou');
       } else {
-        alert(`❌ Order failed: ${data.message || data.error}`);
+        setError('Unexpected payment status.');
       }
     } catch (err) {
-      console.error('Error placing order:', err);
-      alert('❌ Something went wrong');
+      console.error('Stripe payment error:', err);
+      setError(err.message || 'Payment failed.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 py-10">
-      <h2 className="text-3xl font-bold mb-6 text-center">Checkout</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 shadow rounded-lg">
-        {['fullName', 'email', 'phone', 'address', 'city', 'zip'].map(name => (
-          <input
-            key={name}
-            type={name === 'email' ? 'email' : 'text'}
-            name={name}
-            value={form[name]}
-            onChange={handleChange}
-            required
-            placeholder={name.charAt(0).toUpperCase() + name.slice(1)}
-            className="border p-3 rounded"
-          />
-        ))}
-        <div className="md:col-span-2">
-          <label className="block mb-2 font-semibold">Payment Method:</label>
-          <select
-            name="paymentMethod"
-            value={form.paymentMethod}
-            onChange={handleChange}
-            className="border p-3 rounded w-full"
-          >
-            <option value="cash">Cash on Delivery</option>
-            <option value="stripe">Credit/Debit Card (Stripe)</option>
-          </select>
+    <div className="checkout" style={{ padding: '2rem', maxWidth: '500px', margin: 'auto' }}>
+      <h2 style={{ marginBottom: '1rem' }}>Checkout</h2>
+      <form onSubmit={handleSubmit}>
+        <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '8px' }}>
+          <CardElement />
         </div>
-        <div className="md:col-span-2">
-          <h3 className="text-xl font-semibold mb-3">Order Summary</h3>
-          {cartItems.map(item => (
-            <div key={item._id} className="flex justify-between border-b py-2">
-              <span>{item.name} × {item.quantity}</span>
-              <span>Rs. {(item.price * item.quantity).toFixed(2)}</span>
-            </div>
-          ))}
-          <div className="flex justify-between font-bold text-lg mt-4">
-            <span>Total:</span>
-            <span>Rs. {total.toFixed(2)}</span>
-          </div>
-        </div>
+
+        {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
+
         <button
           type="submit"
-          className="md:col-span-2 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 px-6 rounded transition"
+          disabled={!stripe || loading}
+          style={{
+            marginTop: '1.5rem',
+            padding: '0.75rem 1.5rem',
+            backgroundColor: '#6772e5',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+          }}
         >
-          Place Order
+          {loading ? 'Processing...' : `Pay ₹${totalAmount}`}
         </button>
       </form>
     </div>

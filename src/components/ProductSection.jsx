@@ -93,11 +93,11 @@ const ProductSection = () => {
             className="bg-white p-4 rounded-lg shadow hover:shadow-md transition"
           >
             <img
-              src={product.image}
-              alt={product.name}
+              src={product.images?.[0] || "/no-image.png"}
+  alt={product.title}
               className="w-full h-48 object-cover rounded mb-3"
             />
-            <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
+            <h3 className="text-lg font-semibold text-gray-800">{product.title}</h3>
             <p className="text-gray-600 mb-2">${product.price.toFixed(2)}</p>
             <a
               href={`/product/${product.slug}`}

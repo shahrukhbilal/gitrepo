@@ -25,6 +25,8 @@ import AdminShipOrder from './pages/admin/AdminShipOrder';
 import ErrorBoundary from './ErrorBoundary';
 import AdminMessages from './pages/AdminMessages';
 import Products  from './pages/admin/Products';
+import StripeContainer from './StripeContainer';
+import AdminProductForm from './components/AdminProductForm';
 
 
 function App() {
@@ -38,7 +40,7 @@ function App() {
         <Route element={<SimpleLayout />}>
           <Route path="/product/:slug" element={<ProductDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/checkout" element={<StripeContainer/>} />
           <Route path="/thankyou" element={<ThankYouPage />} />
           <Route path="/my-orders" element={<MyOrdersPage />} />
           <Route path="/login" element={<AuthForm />} />
@@ -46,6 +48,7 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/feedback" element={<FeedbackPage />} />
+
           {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
         </Route>
 
@@ -57,6 +60,7 @@ function App() {
   <Route path="users" element={<AdminUsers />} />
   <Route path="stats" element={<AdminDashboard />} />
 <Route path="contacts" element={<AdminMessages />} />
+<Route path='add-product' element={<AdminProductForm/>}></Route>
 <Route path='back' element={<MainLayout></MainLayout>}> </Route>
 </Route>
 

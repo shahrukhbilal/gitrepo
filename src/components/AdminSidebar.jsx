@@ -27,6 +27,7 @@ function AdminSidebar() {
     { name: 'Orders', icon: <ShoppingCart size={20} />, path: '/admin/orders' },
     { name: 'Feedback', icon: <Mail size={20} />, path: '/admin/contacts' },
     { name: 'Back to Site', icon: <ArrowLeftCircle size={20} />, path: '/', logout: true },
+    { name: 'Upload Products',  path: '/admin/add-product'},
   ];
 
   return (

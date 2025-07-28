@@ -36,6 +36,20 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+
+const deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findByIdAndDelete(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete product", error });
+  }
+};
+
+
 // ✅ Get all users
 const getAllUsers = async (req, res) => {
   try {
@@ -128,8 +142,50 @@ const getDashboardStats = async (req, res) => {
     res.status(500).json({ msg: 'Error fetching dashboard stats', error: err.message });
   }
 };
+const createProduct = async (req, res) => {
+  try {
+    // 1. Destructure form data from the request body
+    const { name, slug, description, price, category, stock } = req.body;
 
-// ✅ EXPORT ALL CONTROLLERS
+    // 2. Validate required fields
+    if (!name || !slug || !description || !price || !category) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // 3. Check if file is present
+    if (!req.file) {
+      return res.status(400).json({ message: 'Image file is required' });
+    }
+
+    // 4. Upload image to Cloudinary
+    const cloudUpload = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'products',
+    });
+
+    // 5. Create a new product in DB
+    const newProduct = new Product({
+      name,
+      slug,
+      description,
+      image: cloudUpload.secure_url,  // ✅ Cloudinary image URL
+      price,
+      category,
+      stock,
+    });
+
+    await newProduct.save();
+
+    // 6. Send success response
+    res.status(201).json({
+      message: 'Product created successfully',
+      product: newProduct,
+    });
+  } catch (error) {
+    console.error('Create Product Error:', error.message);
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getAllProducts,
@@ -139,4 +195,6 @@ module.exports = {
   deleteUser,
   updateOrderStatus,
   getDashboardStats,
+  createProduct,
+  deleteProduct
 };
