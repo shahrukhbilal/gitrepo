@@ -21,6 +21,12 @@ app.use(cors())
 
 app.use(express.json())
 
+app.get('/', (req, res) => {
+  res.send('API is live 🚀');
+});
+app.get('/api/products', (req, res) => {
+  res.json([{ name: 'Product 1' }, { name: 'Product 2' }]);
+});
 
 app.use('/api/heroslides', heroSliderRoutes);
 app.use('/api/categories', categoryRoutes);
