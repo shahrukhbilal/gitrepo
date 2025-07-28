@@ -31,6 +31,9 @@ const ProductDetailPage = () => {
 
   if (!product) return <p className="text-center py-20">Loading...</p>;
 
+  const price = Number(product?.price);
+  const oldPrice = Number(product?.oldPrice);
+
   return (
     <section className="py-16 px-4 sm:px-8 lg:px-16 max-w-6xl mx-auto">
       <div className="py-10 grid grid-cols-1 md:grid-cols-2 gap-12 bg-white rounded-2xl shadow-lg overflow-hidden p-6">
@@ -66,12 +69,13 @@ const ProductDetailPage = () => {
             <p className="text-gray-600 mb-6 leading-relaxed">{product.description}</p>
 
             <div className="mb-6">
-  <span className="text-3xl font-bold text-yellow-500">
-    ${Number(product?.price || 0).toFixed(2)}
-  </span>
-
-              {product.oldPrice && (
-                <span className="ml-3 text-gray-500 line-through">${product.oldPrice.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-yellow-500">
+                ${!isNaN(price) ? price.toFixed(2) : "N/A"}
+              </span>
+              {!isNaN(oldPrice) && (
+                <span className="ml-3 text-gray-500 line-through">
+                  ${oldPrice.toFixed(2)}
+                </span>
               )}
             </div>
 
