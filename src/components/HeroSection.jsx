@@ -10,7 +10,7 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const res = await fetch(`${ BASE_URL}/api/heroslides`);
+        const res = await fetch('http://gitrepo-production-6d15.up.railway.app/api/heroslides');
         const data = await res.json();
         setSlides(data);
         setLoading(false);
