@@ -66,7 +66,10 @@ const ProductDetailPage = () => {
             <p className="text-gray-600 mb-6 leading-relaxed">{product.description}</p>
 
             <div className="mb-6">
-              <span className="text-3xl font-bold text-yellow-500">${product.price.toFixed(2)}</span>
+  <span className="text-3xl font-bold text-yellow-500">
+    ${Number(product?.price || 0).toFixed(2)}
+  </span>
+
               {product.oldPrice && (
                 <span className="ml-3 text-gray-500 line-through">${product.oldPrice.toFixed(2)}</span>
               )}
