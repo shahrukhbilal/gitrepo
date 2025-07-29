@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 const BASE_URL = import.meta.env.VITE_API_URL;
 
+
+
 const HeroSection = () => {
   const [slides, setSlides] = useState([]);
   const [current, setCurrent] = useState(0);
@@ -10,7 +12,7 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const res = await fetch('http://gitrepo-production-6d15.up.railway.app/api/heroslides');
+        const res = await fetch(`${BASE_URL}/api/heroslides`); // ✅ replaced localhost
         const data = await res.json();
         setSlides(data);
         setLoading(false);
@@ -52,9 +54,7 @@ const HeroSection = () => {
           {description}
         </p>
         <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0 items-center justify-center md:justify-start">
-        
-        
-          <Link to='/shop' className="bg-yellow-400 hover:bg-yellow-500 px-6 py-2 rounded-full text-black font-semibold hover:shadow-lg transform hover:scale-105 transition duration-300 w-40 sm:w-auto"> shop Now</Link>
+          <Link to='/shop' className="bg-yellow-400 hover:bg-yellow-500 px-6 py-2 rounded-full text-black font-semibold hover:shadow-lg transform hover:scale-105 transition duration-300 w-40 sm:w-auto">shop Now</Link>
           <button className="bg-transparent border border-black px-6 py-2 rounded-full hover:bg-black hover:text-white font-semibold transition duration-300 w-40 sm:w-auto">
             Explore Deals
           </button>
