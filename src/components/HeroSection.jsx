@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-const BASE_URL = import.meta.env.VITE_API_URL;
+
 
 
 
@@ -12,7 +12,7 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/api/heroslides`); // ✅ replaced localhost
+        const res = await fetch("http://localhost:5000/api/heroslides")
         const data = await res.json();
         setSlides(data);
         setLoading(false);

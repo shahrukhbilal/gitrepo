@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { FaTrash } from "react-icons/fa"; // for delete icon
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -6,7 +7,7 @@ const Products = () => {
   const fetchProducts = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch('http://localhost:5000/api/admin/products', {
+      const res = await fetch("http://localhost:5000/api/admin/products", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -34,7 +35,7 @@ const Products = () => {
 
       if (res.ok) {
         alert(result.message);
-        fetchProducts(); // Refresh product list
+        fetchProducts();
       } else {
         alert("Failed to delete product");
       }
@@ -48,40 +49,52 @@ const Products = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6 border-b pb-2">All Products</h2>
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-white py-10 px-6">
+      <div className="max-w-7xl mx-auto bg-white/80 backdrop-blur-md border border-gray-200 shadow-xl rounded-2xl p-6">
+        <h2 className="text-3xl font-bold text-indigo-700 mb-6 border-b pb-4">
+          🛍️ Admin Panel — All Products
+        </h2>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">#</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Name</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Slug</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Category</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-gray-100">
-            {products?.map((product, index) => (
-              <tr key={product._id} className="hover:bg-gray-50 transition duration-150">
-                <td className="px-6 py-4 text-sm text-gray-700">{index + 1}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">{product.title}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">{product.slug}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">{product.category?.name || "N/A"}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  <button
-                    onClick={() => handleDelete(product._id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+        {products.length === 0 ? (
+          <p className="text-center text-gray-500 text-lg">No products found.</p>
+        ) : (
+          <div className="overflow-x-auto rounded-lg shadow-inner">
+            <table className="min-w-full text-sm text-left">
+              <thead className="bg-indigo-100 sticky top-0 z-10">
+                <tr>
+                  <th className="px-6 py-3 font-semibold text-gray-700">#</th>
+                  <th className="px-6 py-3 font-semibold text-gray-700">Product Name</th>
+                  <th className="px-6 py-3 font-semibold text-gray-700">Slug</th>
+                  <th className="px-6 py-3 font-semibold text-gray-700">Category</th>
+                  <th className="px-6 py-3 font-semibold text-gray-700">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {products.map((product, index) => (
+                  <tr
+                    key={product._id}
+                    className="hover:bg-indigo-50 transition duration-200 ease-in-out"
                   >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    <td className="px-6 py-4 text-gray-800">{index + 1}</td>
+                    <td className="px-6 py-4 text-gray-800">{product.title}</td>
+                    <td className="px-6 py-4 text-gray-800">{product.slug}</td>
+                    <td className="px-6 py-4 text-gray-800">
+                      {product.category || "N/A"}
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleDelete(product._id)}
+                        className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow transition-transform transform hover:scale-105"
+                      >
+                        <FaTrash className="text-sm" /> Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

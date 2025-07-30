@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { BASE_URL } from '../api'; // adjust path as needed
 
 const ProductSection = () => {
   const [products, setProducts] = useState([]);
@@ -18,9 +17,12 @@ const ProductSection = () => {
       if (filters.max) params.append('max', filters.max);
       if (filters.sort) params.append('sort', filters.sort);
 
-      const res = await fetch(`${BASE_URL}/api/products?${params}`);
+      const res = await fetch(`http://localhost:5000/api/products?${params}`);
       const data = await res.json();
       setProducts(data);
+      console.log("Fetched products:", data);
+console.log("Fetched products:", data);
+
     } catch (error) {
       console.error('Error fetching products:', error);
     }
@@ -95,7 +97,7 @@ const ProductSection = () => {
           >
             <img
               src={product.images?.[0] || "/no-image.png"}
-              alt={product.title}
+  alt={product.title}
               className="w-full h-48 object-cover rounded mb-3"
             />
             <h3 className="text-lg font-semibold text-gray-800">{product.title}</h3>

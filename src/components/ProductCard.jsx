@@ -9,14 +9,20 @@ const ProductCard = ({ product }) => {
   const handleAdd = () => {
     dispatch(addToCart({ ...product, quantity: 1 }));
   };
+  
 
   return (
     <div className="border rounded-xl p-4 hover:shadow-lg transition">
       <img
-        src={product.images?.[0]} // ✅ show first image in the array
+  src={
+    product?.images?.[0]
+      ? `http://localhost:5000${product.images[0]}`
+      : "/no-image.png"
+  }
   alt={product.title}
-        className="w-full h-48 object-cover rounded-md"
-      />
+  className="w-full h-48 object-cover rounded-md"
+/>
+
       <h3 className="mt-2 text-lg font-bold">{product.title}</h3> {/* ✅ updated */}
       <p className="text-gray-600">{product.category}</p>
       <p className="text-xl font-semibold text-green-600">Rs. {product.price}</p>
