@@ -56,15 +56,18 @@ const getAllProducts = async (req, res) => {
     console.log('🔍 Incoming query params:', req.query); // Log for debugging
 
     // ✅ If category slug is passed, find its corresponding _id
-    if (category) {
-      const categoryDoc = await FeaturedCategory.findOne({ slug: category });
-      if (categoryDoc) {
-        filter.category = categoryDoc._id;
-      } else {
-        console.log('❌ No category matched for slug:', category);
-        return res.status(200).json([]); // No products if invalid category
-      }
-    }
+   // ✅ If category slug is passed, find its corresponding _id or fallback to plain match
+if (category) {
+  const categoryDoc = await FeaturedCategory.findOne({ slug: category });
+
+  if (categoryDoc) {
+    filter.category = category
+  } else {
+    // Fallback for string-based categories (like 'men', 'electronics', etc.)
+    filter.category = category;
+  }
+}
+
 
     // 💰 Handle price filtering
     if (min || max) filter.price = {};
