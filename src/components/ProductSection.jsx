@@ -30,7 +30,7 @@ console.log("Fetched products:", data);
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [filters]);
 
   return (
     <section className="bg-gray-50 py-12 px-4 sm:px-8 md:px-16">
@@ -52,6 +52,7 @@ console.log("Fetched products:", data);
           <option value="men">Men</option>
           <option value="women">Women</option>
           <option value="electronics">Electronics</option>
+          <option value="kids">kids</option>
         </select>
 
         <input
