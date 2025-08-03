@@ -39,8 +39,8 @@ app.use('/api/stripe-orders',stripeOrderRoutes);
 
 
 
-app.listen(PORT, (req, res)=>{
-    console.log('server is running ')
-})
+// app.listen(PORT, (req, res)=>{
+//     console.log('server is running ')
+// })
 
 
