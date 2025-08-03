@@ -17,7 +17,7 @@ const ProductSection = () => {
       if (filters.max) params.append('max', filters.max);
       if (filters.sort) params.append('sort', filters.sort);
 
-      const res = await fetch(`http://localhost:5000/api/products?${params}`);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products?${params}`);
       const data = await res.json();
       setProducts(data);
       console.log("Fetched products:", data);
