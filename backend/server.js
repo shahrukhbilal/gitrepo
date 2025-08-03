@@ -43,4 +43,5 @@ app.use('/api/stripe-orders',stripeOrderRoutes);
 //     console.log('server is running ')
 // })
 
+module.exports = app;
 
