@@ -17,7 +17,13 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const stripeOrderRoutes= require('./routes/stripeOrderRoutes')
 
 connectDB()
-app.use(cors())
+const cors = require('cors');
+
+app.use(cors({
+  origin: ['https://gitrepo-x6rx.vercel.app/'], // 🔁 Replace with your actual Vercel frontend URL
+  credentials: true,
+}));
+
 
 app.use(express.json())
 
