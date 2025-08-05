@@ -12,7 +12,7 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/heroslides")
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/heroslides`)
         const data = await res.json();
         setSlides(data);
         setLoading(false);

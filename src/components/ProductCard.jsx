@@ -16,12 +16,13 @@ const ProductCard = ({ product }) => {
       <img
   src={
     product?.images?.[0]
-      ? `http://localhost:5000${product.images[0]}`
+      ? `${import.meta.env.VITE_API_URL}${product.images[0]}`
       : "/no-image.png"
   }
   alt={product.title}
   className="w-full h-48 object-cover rounded-md"
 />
+
 
       <h3 className="mt-2 text-lg font-bold">{product.title}</h3> {/* ✅ updated */}
       <p className="text-gray-600">{product.category}</p>
