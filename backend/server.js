@@ -19,10 +19,7 @@ const stripeOrderRoutes= require('./routes/stripeOrderRoutes')
 connectDB()
 const cors = require('cors');
 
-app.use(cors({
-  origin: ['https://gitrepo-x6rx.vercel.app/'], // 🔁 Replace with your actual Vercel frontend URL
-  credentials: true,
-}));
+app.use(cors({ origin: "*" }));
 
 
 app.use(express.json())
@@ -45,9 +42,9 @@ app.use('/api/stripe-orders',stripeOrderRoutes);
 
 
 
-// app.listen(PORT, (req, res)=>{
-//     console.log('server is running ')
-// })
+app.listen(PORT, (req, res)=>{
+    console.log('server is running ')
+})
 
 module.exports = app;
 
