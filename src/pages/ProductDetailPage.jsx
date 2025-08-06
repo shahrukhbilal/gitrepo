@@ -13,12 +13,12 @@ const ProductDetailPage = () => {
   const [selectedSize, setSelectedSize] = useState(null);
   const dispatch = useDispatch();
 
-  const BASE_URL = import.meta.env.VITE_API_URL;
+  
 
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const res = await fetch(`${BASE_URL}/api/products/${slug}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${slug}`);
         if (!res.ok) {
           throw new Error("Product not found");
         }
@@ -26,7 +26,7 @@ const ProductDetailPage = () => {
         setProduct(data);
 
         if (data.images && data.images.length > 0) {
-          setMainImage(`${BASE_URL}${data.images[0]}`);
+          setMainImage(`${import.meta.env.VITE_API_URL}${data.images[0]}`);
         }
       } catch (err) {
         console.error("❌ Error fetching product:", err);
@@ -34,7 +34,7 @@ const ProductDetailPage = () => {
       }
     }
     fetchProduct();
-  }, [slug, BASE_URL]);
+  }, [slug]);
 
   const handleAddToCart = () => {
     if (!selectedSize) return;
@@ -62,7 +62,7 @@ const ProductDetailPage = () => {
           {product.images?.length > 1 && (
             <div className="grid grid-cols-4 gap-3 mt-4">
               {product.images.map((img, i) => {
-                const fullImgUrl = `${BASE_URL}${img}`;
+                const fullImgUrl = `${import.meta.env.VITE_API_URL}${img}`;
                 return (
                   <button
                     key={i}
