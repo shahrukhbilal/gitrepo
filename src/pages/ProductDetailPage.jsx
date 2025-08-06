@@ -9,35 +9,39 @@ const ProductDetailPage = () => {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [mainImage, setMainImage] = useState(null);
+  const [mainImage, setMainImage] = useState("/no-image.png");
   const [selectedSize, setSelectedSize] = useState(null);
   const dispatch = useDispatch();
 
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  const BASE_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     async function fetchProduct() {
       try {
         const res = await fetch(`${BASE_URL}/api/products/${slug}`);
+        if (!res.ok) {
+          throw new Error("Product not found");
+        }
         const data = await res.json();
         setProduct(data);
+
         if (data.images && data.images.length > 0) {
           setMainImage(`${BASE_URL}${data.images[0]}`);
-        } else {
-          setMainImage("/no-image.png");
         }
       } catch (err) {
         console.error("❌ Error fetching product:", err);
+        setProduct(null);
       }
     }
     fetchProduct();
-  }, [slug]);
+  }, [slug, BASE_URL]);
 
   const handleAddToCart = () => {
+    if (!selectedSize) return;
     dispatch(addToCart({ ...product, quantity, selectedSize }));
   };
 
-  if (!product) return <p className="text-center py-20">Loading...</p>;
+  if (!product) return <p className="text-center py-20 text-xl">Product not found</p>;
 
   const price = Number(product?.price);
   const oldPrice = Number(product?.oldPrice);
@@ -49,31 +53,34 @@ const ProductDetailPage = () => {
         <div>
           <div className="relative overflow-hidden rounded-xl shadow-md group">
             <img
-              src={product.images}
-              alt={product.title}
+              src={mainImage}
+              alt={product.title || "Product"}
               className="w-full h-[400px] object-cover transform group-hover:scale-105 transition duration-300 ease-in-out"
             />
           </div>
 
           {product.images?.length > 1 && (
             <div className="grid grid-cols-4 gap-3 mt-4">
-              {product.images.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => setMainImage(`${BASE_URL}${img}`)}
-                  className={`rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                    `${BASE_URL}${img}` === mainImage
-                      ? "border-yellow-500"
-                      : "border-transparent hover:border-yellow-300"
-                  }`}
-                >
-                  <img
-                    src={`${BASE_URL}${img}`}
-                    alt={`Thumbnail ${i}`}
-                    className="w-full h-20 object-cover"
-                  />
-                </button>
-              ))}
+              {product.images.map((img, i) => {
+                const fullImgUrl = `${BASE_URL}${img}`;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setMainImage(fullImgUrl)}
+                    className={`rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                      fullImgUrl === mainImage
+                        ? "border-yellow-500"
+                        : "border-transparent hover:border-yellow-300"
+                    }`}
+                  >
+                    <img
+                      src={fullImgUrl}
+                      alt={`Thumbnail ${i}`}
+                      className="w-full h-20 object-cover"
+                    />
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -82,11 +89,11 @@ const ProductDetailPage = () => {
         <div className="flex flex-col justify-between">
           <div>
             <h1 className="text-4xl font-extrabold text-gray-800 mb-4">
-              {product.title || product.name}
+              {product.title || product.name || "Untitled Product"}
             </h1>
 
             <p className="text-gray-600 mb-6 leading-relaxed text-lg">
-              {product.description}
+              {product.description || "No description available."}
             </p>
 
             {/* Price */}
@@ -159,6 +166,7 @@ const ProductDetailPage = () => {
             <button
               onClick={handleAddToCart}
               className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg w-full transition"
+              disabled={!selectedSize}
             >
               🛒 Add to Cart
             </button>
