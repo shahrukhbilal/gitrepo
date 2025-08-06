@@ -1,3 +1,4 @@
+import { Link } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 const ProductSection = () => {
@@ -103,12 +104,12 @@ console.log("Fetched products:", data);
             />
             <h3 className="text-lg font-semibold text-gray-800">{product.title}</h3>
             <p className="text-gray-600 mb-2">${product.price.toFixed(2)}</p>
-            <a
-              href={`/product/${product.slug}`}
-              className="inline-block bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded-full text-sm transition"
+         <Link to={`/product/${product._slug}`}
+          className="inline-block bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded-full text-sm transition"
             >
+              
               View Details
-            </a>
+            </Link>
           </div>
         ))}
       </div>
