@@ -96,11 +96,16 @@ console.log("Fetched products:", data);
             key={product._id}
             className="bg-white p-4 rounded-lg shadow hover:shadow-md transition"
           >
-            <img
-              src={product.images?.[0] || "/no-image.png"}
+           <img
+  src={
+    product?.images?.[0]?.startsWith('http')
+      ? product.images[0]  // If already full URL, use directly
+      : `https://ecom-backend-production-e2cb.up.railway.app${product.images[0]}` // Otherwise, prepend
+  }
   alt={product.title}
-              className="w-full h-48 object-cover rounded mb-3"
-            />
+  className="w-full h-48 object-cover rounded-md"
+/>
+
             <h3 className="text-lg font-semibold text-gray-800">{product.title}</h3>
             <p className="text-gray-600 mb-2">${product.price.toFixed(2)}</p>
             <a
