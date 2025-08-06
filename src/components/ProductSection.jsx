@@ -98,12 +98,12 @@ console.log("Fetched products:", data);
           >
            <img
   src={
-    product?.images?.[0]?.startsWith('http')
-      ? product.images[0]  // If already full URL, use directly
-      : `https://ecom-backend-production-e2cb.up.railway.app${product.images[0]}` // Otherwise, prepend
+    product.images?.[0]?.startsWith("http")
+      ? product.images[0]
+      : `https://ecom-backend-production-e2cb.up.railway.app${product.images[0]}`
   }
   alt={product.title}
-  className="w-full h-48 object-cover rounded-md"
+  className="w-full h-48 object-cover rounded mb-3"
 />
 
             <h3 className="text-lg font-semibold text-gray-800">{product.title}</h3>

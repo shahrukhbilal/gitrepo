@@ -52,11 +52,16 @@ const ProductDetailPage = () => {
         {/* Product Images */}
         <div>
           <div className="relative overflow-hidden rounded-xl shadow-md group">
-            <img
-              src={mainImage}
-              alt={product.title || "Product"}
-              className="w-full h-[400px] object-cover transform group-hover:scale-105 transition duration-300 ease-in-out"
-            />
+           <img
+  src={
+    product?.images?.[0]?.startsWith('http')
+      ? product.images[0]  // If already full URL, use directly
+      : `https://ecom-backend-production-e2cb.up.railway.app${product.images[0]}` // Otherwise, prepend
+  }
+  alt={product.title}
+  className="w-full h-48 object-cover rounded-md"
+/>
+
           </div>
 
           {product.images?.length > 1 && (
