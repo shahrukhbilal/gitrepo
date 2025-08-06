@@ -18,7 +18,7 @@ const ProductDetailPage = () => {
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${slug}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/slug/${slug}`);
         if (!res.ok) {
           throw new Error("Product not found");
         }
