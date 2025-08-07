@@ -105,6 +105,10 @@ const AuthForm = () => {
           secretKey: '',
         });
         console.log('User info:', res.user);
+        if(res.user.isAdmin !== 'admin'){
+          navigate('/my-orders')
+        }
+
 
        res.user.isAdmin ? navigate('/admin') : navigate('/my-orders');
 
