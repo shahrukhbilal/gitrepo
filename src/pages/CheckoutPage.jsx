@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import CheckoutFormShippmentInfo from './CheckoutFormShippmentInfo'; // ✅ mount this
 
 const CheckoutPage = () => {
   const stripe = useStripe();
@@ -9,13 +10,13 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
 
   const cartItems = useSelector((state) => state.cart.items || []);
+  const { user } = useSelector((state) => state.auth);
 
-const totalAmount = cartItems.reduce(
-  (sum, item) => sum + item.price * item.quantity,
-  0
-);
+  const totalAmount = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
-  const { user } = useSelector((state) => state.auth); // assuming auth slice
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -32,9 +33,9 @@ const totalAmount = cartItems.reduce(
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${user?.token}`, // include if using JWT
+          Authorization: `Bearer ${user?.token}`,
         },
-        body: JSON.stringify({ amount: totalAmount * 100 }), // Stripe requires amount in cents
+        body: JSON.stringify({ amount: totalAmount * 100 }),
       });
 
       if (!res.ok) {
@@ -45,11 +46,14 @@ const totalAmount = cartItems.reduce(
       const { clientSecret } = await res.json();
 
       const result = await stripe.confirmCardPayment(clientSecret, {
-  payment_method: {
-    card: elements.getElement(CardElement),
-    billing_details: { name: 'Your Name' },
-  },
-});
+        payment_method: {
+          card: elements.getElement(CardElement),
+          billing_details: {
+            name: user?.name || 'Guest User',
+            email: user?.email || '',
+          },
+        },
+      });
 
       if (result.error) {
         setError(result.error.message);
@@ -67,27 +71,36 @@ const totalAmount = cartItems.reduce(
   };
 
   return (
-    <div className="checkout" style={{ padding: '2rem', maxWidth: '500px', margin: 'auto' }}>
-      <h2 style={{ marginBottom: '1rem' }}>Checkout</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '8px' }}>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <h2 className="text-2xl font-semibold mb-6 text-center">Checkout</h2>
+
+      {/* ✅ Shipping Info Component */}
+      <div className="mb-6">
+        <CheckoutFormShippmentInfo />
+      </div>
+
+      {/* ✅ Stripe Card Payment */}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 shadow-lg rounded-lg"
+      >
+        <label className="block mb-2 font-medium text-gray-700">
+          Card Details
+        </label>
+        <div className="border border-gray-300 p-4 rounded">
           <CardElement />
         </div>
 
-        {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
+        {error && (
+          <p className="text-red-600 mt-4">{error}</p>
+        )}
 
         <button
           type="submit"
           disabled={!stripe || loading}
-          style={{
-            marginTop: '1.5rem',
-            padding: '0.75rem 1.5rem',
-            backgroundColor: '#6772e5',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-          }}
+          className={`mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded ${
+            loading ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         >
           {loading ? 'Processing...' : `Pay ₹${totalAmount}`}
         </button>
