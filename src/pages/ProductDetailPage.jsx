@@ -37,6 +37,10 @@ const ProductDetailPage = () => {
   }, [slug]);
 
   const handleAddToCart = () => {
+    const token = localStorage.getItem('token')
+    if (!token){
+      alert('please login')
+    }
     if (!selectedSize) return;
     dispatch(addToCart({ ...product, quantity, selectedSize }));
   };
