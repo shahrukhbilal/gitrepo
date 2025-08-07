@@ -4,7 +4,7 @@ const AdminMessages = () => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/contact')
+    fetch(`${import.meta.env.VITE_API_URL}/api/contact`)
       .then((res) => res.json())
       .then((data) => setMessages(data))
       .catch((err) => console.error('Error fetching messages:', err));
