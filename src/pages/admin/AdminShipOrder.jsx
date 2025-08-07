@@ -11,7 +11,7 @@ function AdminShipOrder() {
     const fetchOrder = async () => {
       const token = localStorage.getItem("token");
       try {
-        const res = await fetch(`http://localhost:5000/api/admin/orders/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/orders/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -30,7 +30,7 @@ function AdminShipOrder() {
   const handleShip = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/orders/${id}/status`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/orders/${id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

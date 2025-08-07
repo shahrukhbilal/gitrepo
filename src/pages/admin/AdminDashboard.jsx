@@ -26,7 +26,7 @@ const [adminData, setAdminData] = useState({
     // ✅ Admin data fetch
     const fetchAdminData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/admin/stats', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/stats`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

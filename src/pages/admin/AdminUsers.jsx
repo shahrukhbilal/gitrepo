@@ -8,7 +8,7 @@ const AdminUsers = () => {
   useEffect(() => {
     const fetchAdminUsers = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/admin/users', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
@@ -32,7 +32,7 @@ const AdminUsers = () => {
     if (!confirm) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

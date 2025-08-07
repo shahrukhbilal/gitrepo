@@ -20,7 +20,7 @@ const AdminOrders = () => {
   const fetchOrders = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch("http://localhost:5000/api/admin/orders", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}00/api/admin/orders`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -39,7 +39,7 @@ const AdminOrders = () => {
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(
-        `http://localhost:5000/api/admin/orders/${orderId}/status`,
+        `${import.meta.env.VITE_API_URL}/api/admin/orders/${orderId}/status`,
         {
           method: "PUT",
           headers: {
@@ -70,7 +70,7 @@ const AdminOrders = () => {
     const token = localStorage.getItem("token");
     try {
       const response = await fetch(
-        `http://localhost:5000/api/admin/orders/${orderId}`,
+        `${import.meta.env.VITE_API_URL}/api/admin/orders/${orderId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

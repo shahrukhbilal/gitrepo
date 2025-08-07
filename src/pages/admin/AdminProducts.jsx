@@ -5,7 +5,7 @@ const AdminProducts = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token'); // or from Redux
-    fetch('http://localhost:5000/api/admin/products', {
+    fetch(`${import.meta.env.VITE_API_URL}/api/admin/products`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
