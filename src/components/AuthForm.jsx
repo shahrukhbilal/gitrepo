@@ -82,7 +82,8 @@ const AuthForm = () => {
           isAdmin: false,
           secretKey: '',
         });
-        res.user.role === 'admin' ? navigate('/admin') : navigate('/my-orders');
+       res.user.isAdmin ? navigate('/admin') : navigate('/my-orders');
+
 
       } else {
         const res = await register({
@@ -103,7 +104,10 @@ const AuthForm = () => {
           isAdmin: false,
           secretKey: '',
         });
-       res.user.role === 'admin' ? navigate('/admin') : navigate('/my-orders');
+        console.log('User info:', res.user);
+
+       res.user.isAdmin ? navigate('/admin') : navigate('/my-orders');
+
 
       }
     } catch (error) {
