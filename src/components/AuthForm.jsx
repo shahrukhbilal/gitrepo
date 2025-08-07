@@ -13,6 +13,7 @@ const AuthForm = () => {
     password: '',
     confirmPassword: '',
     isAdmin: false,
+    secretKey: '',
   });
 
   const navigate = useNavigate();
@@ -28,12 +29,16 @@ const AuthForm = () => {
       password: '',
       confirmPassword: '',
       isAdmin: false,
+      secretKey: '',
     });
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
   const validateForm = () => {
@@ -47,6 +52,10 @@ const AuthForm = () => {
     }
     if (!isLogin && formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match');
+      return false;
+    }
+    if (!isLogin && formData.isAdmin && !formData.secretKey) {
+      toast.error('Please enter the secret key to register as an admin');
       return false;
     }
     return true;
@@ -65,19 +74,37 @@ const AuthForm = () => {
 
         dispatch(setCredentials(res));
         toast.success('Login successful');
-        setFormData({ name: '', email: '', password: '', confirmPassword: '', isAdmin: false });
-        res.user.isAdmin ? navigate('/admin') : navigate('/my-orders');
+        setFormData({
+          name: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          isAdmin: false,
+          secretKey: '',
+        });
+        res.user.role === 'admin' ? navigate('/admin') : navigate('/my-orders');
+
       } else {
         const res = await register({
           name: formData.name,
           email: formData.email,
           password: formData.password,
+          role: formData.isAdmin ? 'admin' : 'user',
+          secretKey: formData.isAdmin ? formData.secretKey : undefined,
         }).unwrap();
 
         dispatch(setCredentials(res));
         toast.success('Registration successful');
-        setFormData({ name: '', email: '', password: '', confirmPassword: '', isAdmin: false });
-        res.user.isAdmin ? navigate('/admin') : navigate('/my-orders');
+        setFormData({
+          name: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          isAdmin: false,
+          secretKey: '',
+        });
+       res.user.role === 'admin' ? navigate('/admin') : navigate('/my-orders');
+
       }
     } catch (error) {
       toast.error(error?.data?.message || 'Something went wrong');
@@ -134,6 +161,32 @@ const AuthForm = () => {
               autoComplete="new-password"
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          )}
+
+          {!isLogin && (
+            <div className="space-y-2">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="isAdmin"
+                  checked={formData.isAdmin}
+                  onChange={handleChange}
+                  className="w-4 h-4"
+                />
+                <span className="text-gray-700">Register as Admin</span>
+              </label>
+
+              {formData.isAdmin && (
+                <input
+                  type="text"
+                  name="secretKey"
+                  placeholder="Enter Admin Secret Key"
+                  value={formData.secretKey}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              )}
+            </div>
           )}
 
           <button
