@@ -76,7 +76,7 @@ const CheckoutPage = () => {
 
       {/* ✅ Shipping Info Component */}
       <div className="mb-6">
-        <CheckoutFormShippmentInfo />
+        <CheckoutFormShippmentInfo></CheckoutFormShippmentInfo>
       </div>
 
       {/* ✅ Stripe Card Payment */}
