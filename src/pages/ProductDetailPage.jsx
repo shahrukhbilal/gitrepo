@@ -40,7 +40,8 @@ const ProductDetailPage = () => {
     const token = localStorage.getItem('token')
     if (!token){
       alert('please login')
-    }
+      return
+    } 
     if (!selectedSize) return;
     dispatch(addToCart({ ...product, quantity, selectedSize }));
   };
