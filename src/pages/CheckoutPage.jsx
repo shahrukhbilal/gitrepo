@@ -110,24 +110,35 @@ const token= localStorage.getItem('token')
       if (result.error) {
         setError(result.error.message);
       } else if (result.paymentIntent.status === 'succeeded') {
-        await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            cartItems,
-            shippingInfo,
-            paymentMethod: 'Stripe',
-            total: totalAmount,
-            paymentStatus: 'Paid',
-            paymentId: result.paymentIntent.id,
-          }),
-        });
+  await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`, // same as payment intent call
+    },
+    body: JSON.stringify({
+      cartItems: cartItems.map(item => ({
+        productId: item.productId,  // ✅ required
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+      })),
+      shippingInfo: {
+        name: shippingInfo.name,
+        email: shippingInfo.email,
+        phone: shippingInfo.phone,
+        address: shippingInfo.address
+      },
+      total: totalAmount,
+      paymentMethod: 'Stripe',
+      paymentStatus: 'Paid'
+      // paymentId: result.paymentIntent.id  // Optional: add in model if you want
+    }),
+  });
 
-        navigate('/thankyou');
-      } else {
+  navigate('/thankyou');
+}
+ else {
         setError('Unexpected payment status.');
       }
     } catch (err) {
