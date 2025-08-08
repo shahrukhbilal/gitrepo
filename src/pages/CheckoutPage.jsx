@@ -73,7 +73,7 @@ const CheckoutPage = () => {
   // Stripe Payment
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+const token= localStorage.getItem('token')
     if (!stripe || !elements) return;
     if (!shippingInfo.name || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.address) {
       setError('Please fill in all shipping details.');
@@ -114,7 +114,7 @@ const CheckoutPage = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${user?.token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             cartItems,
