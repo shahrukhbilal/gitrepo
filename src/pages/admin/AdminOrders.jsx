@@ -20,7 +20,7 @@ const AdminOrders = () => {
   const fetchOrders = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin-orders`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/orders`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
