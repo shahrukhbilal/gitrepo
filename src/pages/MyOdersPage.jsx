@@ -11,7 +11,7 @@ const MyOrdersPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/orders/my-orders', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/my-orders`, {
           headers: {
             'Content-Type': 'application/json',
          Authorization: `Bearer ${token}`,
