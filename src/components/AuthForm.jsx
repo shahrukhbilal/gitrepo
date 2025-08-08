@@ -101,7 +101,7 @@ const AuthForm = () => {
           email: '',
           password: '',
           confirmPassword: '',
-          isAdmin: false,
+          isAdmin: formData.isAdmin ,
           secretKey: '',
         });
         console.log('User info:', res.user);
