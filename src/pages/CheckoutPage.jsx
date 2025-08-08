@@ -9,31 +9,19 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
 
   const cartItems = useSelector((state) => state.cart.items || []);
-  const { user } = useSelector((state) => state.auth);
+
+const totalAmount = cartItems.reduce(
+  (sum, item) => sum + item.price * item.quantity,
+  0
+);
+
+  const { user } = useSelector((state) => state.auth); // assuming auth slice
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Shipping details
-  const [shipping, setShipping] = useState({
-    fullName: '',
-    address: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: '',
-  });
-
-  const totalAmount = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-
-  const handleInputChange = (e) => {
-    setShipping({ ...shipping, [e.target.name]: e.target.value });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!stripe || !elements) return;
 
     setLoading(true);
@@ -44,9 +32,9 @@ const CheckoutPage = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${user?.token}`,
+          Authorization: `Bearer ${user?.token}`, // include if using JWT
         },
-        body: JSON.stringify({ amount: totalAmount * 100 }),
+        body: JSON.stringify({ amount: totalAmount * 100 }), // Stripe requires amount in cents
       });
 
       if (!res.ok) {
@@ -57,21 +45,11 @@ const CheckoutPage = () => {
       const { clientSecret } = await res.json();
 
       const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardElement),
-          billing_details: { name: shipping.fullName || 'Unknown' },
-        },
-        shipping: {
-          name: shipping.fullName,
-          address: {
-            line1: shipping.address,
-            city: shipping.city,
-            state: shipping.state,
-            postal_code: shipping.postalCode,
-            country: shipping.country,
-          },
-        },
-      });
+  payment_method: {
+    card: elements.getElement(CardElement),
+    billing_details: { name: 'Your Name' },
+  },
+});
 
       if (result.error) {
         setError(result.error.message);
@@ -89,76 +67,31 @@ const CheckoutPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-center">Checkout</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Shipping Info & Payment */}
-        <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 shadow rounded-lg">
-          <h2 className="text-xl font-semibold">Shipping Information</h2>
-
-          <input type="text" name="fullName" placeholder="Full Name" required
-            value={shipping.fullName} onChange={handleInputChange}
-            className="w-full border px-4 py-2 rounded" />
-
-          <input type="text" name="address" placeholder="Address" required
-            value={shipping.address} onChange={handleInputChange}
-            className="w-full border px-4 py-2 rounded" />
-
-          <div className="grid grid-cols-2 gap-4">
-            <input type="text" name="city" placeholder="City" required
-              value={shipping.city} onChange={handleInputChange}
-              className="w-full border px-4 py-2 rounded" />
-
-            <input type="text" name="state" placeholder="State" required
-              value={shipping.state} onChange={handleInputChange}
-              className="w-full border px-4 py-2 rounded" />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <input type="text" name="postalCode" placeholder="Postal Code" required
-              value={shipping.postalCode} onChange={handleInputChange}
-              className="w-full border px-4 py-2 rounded" />
-
-            <input type="text" name="country" placeholder="Country" required
-              value={shipping.country} onChange={handleInputChange}
-              className="w-full border px-4 py-2 rounded" />
-          </div>
-
-          <h2 className="text-xl font-semibold pt-4">Payment Details</h2>
-
-          <div className="p-4 border rounded bg-gray-50">
-            <CardElement />
-          </div>
-
-          {error && <p className="text-red-600">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={!stripe || loading}
-            className={`w-full py-3 rounded bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {loading ? 'Processing...' : `Pay ₹${totalAmount}`}
-          </button>
-        </form>
-
-        {/* Order Summary */}
-        <div className="bg-gray-100 p-6 rounded shadow">
-          <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-          {cartItems.map((item, index) => (
-            <div key={index} className="flex justify-between py-2 border-b">
-              <span>{item.name}</span>
-              <span>₹{item.price} × {item.quantity}</span>
-            </div>
-          ))}
-          <div className="flex justify-between font-bold text-lg pt-4">
-            <span>Total:</span>
-            <span>₹{totalAmount}</span>
-          </div>
+    <div className="checkout" style={{ padding: '2rem', maxWidth: '500px', margin: 'auto' }}>
+      <h2 style={{ marginBottom: '1rem' }}>Checkout</h2>
+      <form onSubmit={handleSubmit}>
+        <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '8px' }}>
+          <CardElement />
         </div>
-      </div>
+
+        {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
+
+        <button
+          type="submit"
+          disabled={!stripe || loading}
+          style={{
+            marginTop: '1.5rem',
+            padding: '0.75rem 1.5rem',
+            backgroundColor: '#6772e5',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+          }}
+        >
+          {loading ? 'Processing...' : `Pay ₹${totalAmount}`}
+        </button>
+      </form>
     </div>
   );
 };
