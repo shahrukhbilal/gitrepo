@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
@@ -19,25 +19,24 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // New States for shipping info
+  // Updated shipping info to match backend model
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
-    address: '',
-    city: '',
+    email: '',
     phone: '',
+    address: '',
   });
 
-  // Payment method selection
   const [paymentMethod, setPaymentMethod] = useState('stripe');
 
   const handleChange = (e) => {
     setShippingInfo({ ...shippingInfo, [e.target.name]: e.target.value });
   };
 
-  // COD order place
+  // Cash on Delivery
   const handleCOD = async (e) => {
     e.preventDefault();
-    if (!shippingInfo.name || !shippingInfo.address || !shippingInfo.city || !shippingInfo.phone) {
+    if (!shippingInfo.name || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.address) {
       setError('Please fill in all shipping details.');
       return;
     }
@@ -51,11 +50,11 @@ const CheckoutPage = () => {
           Authorization: `Bearer ${user?.token}`,
         },
         body: JSON.stringify({
-          orderItems: cartItems,
+          cartItems,
           shippingInfo,
           paymentMethod: 'COD',
-          totalAmount,
-          isPaid: false,
+          total: totalAmount,
+          paymentStatus: 'Pending',
         }),
       });
 
@@ -71,12 +70,12 @@ const CheckoutPage = () => {
     }
   };
 
-  // Stripe payment logic (unchanged)
+  // Stripe Payment
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!stripe || !elements) return;
-    if (!shippingInfo.name || !shippingInfo.address || !shippingInfo.city || !shippingInfo.phone) {
+    if (!shippingInfo.name || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.address) {
       setError('Please fill in all shipping details.');
       return;
     }
@@ -104,14 +103,13 @@ const CheckoutPage = () => {
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
-          billing_details: { name: shippingInfo.name },
+          billing_details: { name: shippingInfo.name, email: shippingInfo.email, phone: shippingInfo.phone },
         },
       });
 
       if (result.error) {
         setError(result.error.message);
       } else if (result.paymentIntent.status === 'succeeded') {
-        // Save order after successful payment
         await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
           method: 'POST',
           headers: {
@@ -119,11 +117,12 @@ const CheckoutPage = () => {
             Authorization: `Bearer ${user?.token}`,
           },
           body: JSON.stringify({
-            orderItems: cartItems,
+            cartItems,
             shippingInfo,
             paymentMethod: 'Stripe',
-            totalAmount,
-            isPaid: true,
+            total: totalAmount,
+            paymentStatus: 'Paid',
+            paymentId: result.paymentIntent.id,
           }),
         });
 
@@ -143,7 +142,6 @@ const CheckoutPage = () => {
     <div className="checkout" style={{ padding: '2rem', maxWidth: '500px', margin: 'auto' }}>
       <h2 style={{ marginBottom: '1rem' }}>Checkout</h2>
 
-      {/* Shipping Info Form */}
       <form onSubmit={paymentMethod === 'stripe' ? handleSubmit : handleCOD}>
         <input
           type="text"
@@ -154,18 +152,10 @@ const CheckoutPage = () => {
           style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
         />
         <input
-          type="text"
-          name="address"
-          placeholder="Address"
-          value={shippingInfo.address}
-          onChange={handleChange}
-          style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
-        />
-        <input
-          type="text"
-          name="city"
-          placeholder="City"
-          value={shippingInfo.city}
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={shippingInfo.email}
           onChange={handleChange}
           style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
         />
@@ -175,10 +165,18 @@ const CheckoutPage = () => {
           placeholder="Phone"
           value={shippingInfo.phone}
           onChange={handleChange}
+          style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
+        />
+        <input
+          type="text"
+          name="address"
+          placeholder="Address"
+          value={shippingInfo.address}
+          onChange={handleChange}
           style={{ width: '100%', marginBottom: '1rem', padding: '0.5rem' }}
         />
 
-        {/* Payment Method Selection */}
+        {/* Payment Method */}
         <div style={{ marginBottom: '1rem' }}>
           <label>
             <input
@@ -186,8 +184,7 @@ const CheckoutPage = () => {
               value="stripe"
               checked={paymentMethod === 'stripe'}
               onChange={() => setPaymentMethod('stripe')}
-            />
-            Pay with Card (Stripe)
+            /> Pay with Card (Stripe)
           </label>
           <br />
           <label>
@@ -196,12 +193,10 @@ const CheckoutPage = () => {
               value="cod"
               checked={paymentMethod === 'cod'}
               onChange={() => setPaymentMethod('cod')}
-            />
-            Cash on Delivery
+            /> Cash on Delivery
           </label>
         </div>
 
-        {/* Stripe Card Element */}
         {paymentMethod === 'stripe' && (
           <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '8px' }}>
             <CardElement />
@@ -231,4 +226,3 @@ const CheckoutPage = () => {
 };
 
 export default CheckoutPage;
-
