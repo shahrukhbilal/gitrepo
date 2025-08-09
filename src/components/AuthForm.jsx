@@ -6,6 +6,7 @@ import { useLoginMutation, useRegisterMutation } from '../redux/api';
 import { setCredentials } from '../redux/authSlice';
 
 const AuthForm = () => {
+  
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
