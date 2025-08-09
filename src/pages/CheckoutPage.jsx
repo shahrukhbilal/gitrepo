@@ -1,3 +1,4 @@
+// CheckoutPage.jsx
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -19,9 +20,9 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Updated shipping info to match backend model
+  // ✅ Use same field names as backend expects
   const [shippingInfo, setShippingInfo] = useState({
-    name: '',
+    fullName: '',
     email: '',
     phone: '',
     address: '',
@@ -33,10 +34,10 @@ const CheckoutPage = () => {
     setShippingInfo({ ...shippingInfo, [e.target.name]: e.target.value });
   };
 
-  // Cash on Delivery
+  // ✅ COD Order
   const handleCOD = async (e) => {
     e.preventDefault();
-    if (!shippingInfo.name || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.address) {
+    if (!shippingInfo.fullName || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.address) {
       setError('Please fill in all shipping details.');
       return;
     }
@@ -50,7 +51,12 @@ const CheckoutPage = () => {
           Authorization: `Bearer ${user?.token}`,
         },
         body: JSON.stringify({
-          cartItems,
+          cartItems: cartItems.map(item => ({
+            productId: item.productId || item._id, // ✅ ensure productId exists
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price
+          })),
           shippingInfo,
           paymentMethod: 'COD',
           total: totalAmount,
@@ -70,12 +76,12 @@ const CheckoutPage = () => {
     }
   };
 
-  // Stripe Payment
+  // ✅ Stripe Payment
   const handleSubmit = async (e) => {
     e.preventDefault();
-const token= localStorage.getItem('token')
+    const token = localStorage.getItem('token');
     if (!stripe || !elements) return;
-    if (!shippingInfo.name || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.address) {
+    if (!shippingInfo.fullName || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.address) {
       setError('Please fill in all shipping details.');
       return;
     }
@@ -103,42 +109,39 @@ const token= localStorage.getItem('token')
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
-          billing_details: { name: shippingInfo.name, email: shippingInfo.email, phone: shippingInfo.phone },
+          billing_details: {
+            name: shippingInfo.fullName,
+            email: shippingInfo.email,
+            phone: shippingInfo.phone
+          },
         },
       });
 
       if (result.error) {
         setError(result.error.message);
       } else if (result.paymentIntent.status === 'succeeded') {
-  await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`, // same as payment intent call
-    },
-    body: JSON.stringify({
-      cartItems: cartItems.map(item => ({
-        productId: item.productId,  // ✅ required
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price
-      })),
-      shippingInfo: {
-        name: shippingInfo.name,
-        email: shippingInfo.email,
-        phone: shippingInfo.phone,
-        address: shippingInfo.address
-      },
-      total: totalAmount,
-      paymentMethod: 'Stripe',
-      paymentStatus: 'Paid'
-      // paymentId: result.paymentIntent.id  // Optional: add in model if you want
-    }),
-  });
+        await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            cartItems: cartItems.map(item => ({
+              productId: item.productId || item._id,
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price
+            })),
+            shippingInfo,
+            total: totalAmount,
+            paymentMethod: 'Stripe',
+            paymentStatus: 'Paid',
+          }),
+        });
 
-  navigate('/thankyou');
-}
- else {
+        navigate('/thankyou');
+      } else {
         setError('Unexpected payment status.');
       }
     } catch (err) {
@@ -156,9 +159,9 @@ const token= localStorage.getItem('token')
       <form onSubmit={paymentMethod === 'stripe' ? handleSubmit : handleCOD}>
         <input
           type="text"
-          name="name"
+          name="fullName"
           placeholder="Full Name"
-          value={shippingInfo.name}
+          value={shippingInfo.fullName}
           onChange={handleChange}
           style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
         />
