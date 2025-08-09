@@ -22,7 +22,7 @@ const CheckoutPage = () => {
 
   // ✅ Use same field names as backend expects
   const [shippingInfo, setShippingInfo] = useState({
-    fullName: '',
+    name: '',
     email: '',
     phone: '',
     address: '',
@@ -37,7 +37,7 @@ const CheckoutPage = () => {
   // ✅ COD Order
   const handleCOD = async (e) => {
     e.preventDefault();
-    if (!shippingInfo.fullName || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.address) {
+    if (!shippingInfo.name || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.address) {
       setError('Please fill in all shipping details.');
       return;
     }
@@ -81,7 +81,7 @@ const CheckoutPage = () => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     if (!stripe || !elements) return;
-    if (!shippingInfo.fullName || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.address) {
+    if (!shippingInfo.name || !shippingInfo.email || !shippingInfo.phone || !shippingInfo.address) {
       setError('Please fill in all shipping details.');
       return;
     }
@@ -110,7 +110,7 @@ const CheckoutPage = () => {
         payment_method: {
           card: elements.getElement(CardElement),
           billing_details: {
-            name: shippingInfo.fullName,
+            name: shippingInfo.name,
             email: shippingInfo.email,
             phone: shippingInfo.phone
           },
@@ -159,9 +159,9 @@ const CheckoutPage = () => {
       <form onSubmit={paymentMethod === 'stripe' ? handleSubmit : handleCOD}>
         <input
           type="text"
-          name="fullName"
+          name="name"
           placeholder="Full Name"
-          value={shippingInfo.fullName}
+          value={shippingInfo.name}
           onChange={handleChange}
           style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
         />

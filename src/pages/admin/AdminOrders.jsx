@@ -20,12 +20,15 @@ const AdminOrders = () => {
   const fetchOrders = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/orders`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/admin/orders`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to fetch orders");
       const data = await response.json();
@@ -103,13 +106,9 @@ const AdminOrders = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen p-6">
-      {/* Header Section Matching Style */}
+      {/* Header */}
       <div className="flex items-center gap-2 mb-4">
-        <img
-          src="/icons/package-icon.png"
-          alt="Orders"
-          className="w-6 h-6"
-        />
+        <img src="/icons/package-icon.png" alt="Orders" className="w-6 h-6" />
         <h1 className="text-2xl font-bold text-[#3c1df0]">
           Admin Panel — All Orders
         </h1>
@@ -137,28 +136,40 @@ const AdminOrders = () => {
             <tbody className="divide-y divide-gray-200 bg-white">
               {orders.map((order) => (
                 <tr key={order._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-mono">{order._id.slice(-6)}</td>
-                  <td className="px-4 py-3">{order.user?.name || order.fullName}</td>
-                  <td className="px-4 py-3">{order.user?.email || order.email}</td>
-                  <td className="px-4 py-3 text-xs">
-                   <ul className="list-disc list-inside space-y-1">
-  {order.items?.map((item, i) => (
-    <li key={i}>
-      {item.name} × {item.quantity}
-    </li>
-  ))}
-</ul>
-
+                  <td className="px-4 py-3 font-mono">
+                    {order._id.slice(-6)}
                   </td>
+
+                  {/* Updated Customer Info */}
+                  <td className="px-4 py-3">
+                    {order.user?.name || order.shippingInfo?.name}
+                  </td>
+                  <td className="px-4 py-3">
+                    {order.user?.email || order.shippingInfo?.email}
+                  </td>
+
+                  {/* Updated Items */}
+                  <td className="px-4 py-3 text-xs">
+                    <ul className="list-disc list-inside space-y-1">
+                      {order.cartItems?.map((item, i) => (
+                        <li key={i}>
+                          {item.name} × {item.quantity}
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+
                   <td className="px-4 py-3 font-semibold text-green-600">
-                    ${order.total.toFixed(2)}
+                    ${order.total?.toFixed(2)}
                   </td>
                   <td className="px-4 py-3">
                     {new Date(order.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(order.status)}`}
+                      className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(
+                        order.status
+                      )}`}
                     >
                       {order.status}
                     </span>
@@ -167,7 +178,9 @@ const AdminOrders = () => {
                       onChange={(e) =>
                         handleStatusChange(order._id, e.target.value)
                       }
-                      disabled={["delivered", "cancelled"].includes(order.status)}
+                      disabled={["delivered", "cancelled"].includes(
+                        order.status
+                      )}
                       className={`mt-2 block w-full text-xs border rounded p-1 ${
                         ["delivered", "cancelled"].includes(order.status)
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -183,7 +196,9 @@ const AdminOrders = () => {
                   </td>
                   <td className="px-4 py-3 text-center flex flex-col sm:flex-row gap-2 justify-center">
                     <button
-                      onClick={() => navigate(`/admin/orders/ship/${order._id}`)}
+                      onClick={() =>
+                        navigate(`/admin/orders/ship/${order._id}`)
+                      }
                       className="flex items-center justify-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-xs rounded"
                     >
                       <Truck size={14} /> Ship
