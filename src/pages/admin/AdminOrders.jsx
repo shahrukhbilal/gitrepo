@@ -141,13 +141,14 @@ const AdminOrders = () => {
                   <td className="px-4 py-3">{order.user?.name || order.fullName}</td>
                   <td className="px-4 py-3">{order.user?.email || order.email}</td>
                   <td className="px-4 py-3 text-xs">
-                    <ul className="list-disc list-inside space-y-1">
-                      {order.items.map((item, i) => (
-                        <li key={i}>
-                          {item.name} × {item.quantity}
-                        </li>
-                      ))}
-                    </ul>
+                   <ul className="list-disc list-inside space-y-1">
+  {order.items?.map((item, i) => (
+    <li key={i}>
+      {item.name} × {item.quantity}
+    </li>
+  ))}
+</ul>
+
                   </td>
                   <td className="px-4 py-3 font-semibold text-green-600">
                     ${order.total.toFixed(2)}
