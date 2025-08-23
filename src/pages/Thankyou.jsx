@@ -2,7 +2,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle2 } from 'lucide-react'; // Lucide check icon
-
 const ThankYouPage = () => (
   <div className="min-h-screen bg-gradient-to-br from-white via-yellow-50 to-yellow-100 flex flex-col items-center justify-center p-4">
     <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center space-y-6">
@@ -25,5 +24,4 @@ const ThankYouPage = () => (
     </footer>
   </div>
 );
-
 export default ThankYouPage;
